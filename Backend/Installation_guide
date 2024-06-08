@@ -18,6 +18,57 @@ VERY IMPORTANT
 
 # Type "npm run stopdev" to stop the Backend Server
 
+-----------------------------------------------------
+SCHEMA:
+
+events Schema
+
+    title: String,
+    short_desc: String,
+    details: String,
+    submitted_by: String,
+    submitted_at: String,
+    status: String,
+    due_date: String,
+    priority: String,
+    image_urls: String,
+    last_updated: String
+
+
+Claims schema
+  
+    title: String,
+    short_desc: String,
+    details: String,
+    submitted_by: String,
+    submitted_at: String,
+    status: String,
+    due_date: String,
+    priority: String,
+    expense_amount: Number,
+    comments: String,
+    last_updated: String
+  
+
+Events status Logs Schema 
+  
+    title: String,
+    short_desc: String,
+    submitted_at: String,
+    status: String
+
+
+Claims status Log schema
+  
+    title: String,
+    short_desc: String,
+    submitted_at: String,
+    status: String,
+    expense_amount: Number
+
+---------------------------------------------------
+
+
 
 You can use any of these routes.
 ---------------------------------------------------
