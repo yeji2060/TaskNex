@@ -179,7 +179,7 @@ https://tasknexserver.onrender.com/getEventsStatusLog
 this api will get all events log.
 
 
-https://tasknexserver.onrender.com/getEventsStatusLog?eventsRequests
+https://tasknexserver.onrender.com/getEventsStatusLog?eventsRequests=
 
 this api will get an event log (Provide the title of the event)
 
@@ -189,7 +189,7 @@ https://tasknexserver.onrender.com/getClaimsStatusLog
 this api will get all claims log.
 
 
-https://tasknexserver.onrender.com/getEventsStatusLog?ClaimRequest
+https://tasknexserver.onrender.com/getEventsStatusLog?ClaimRequest=
 
 this api will get a claim log (Provide the title of the claim)
 
