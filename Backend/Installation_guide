@@ -1,0 +1,12 @@
+<!-- # run npm install to install all dependencies
+
+# Install PM2 with "npm install pm2 -g" which keeps the backend server running (A replacement for nodemon).
+    # PM2 is a process manager for Node.js applications. It allows you to easily manage, monitor, 
+    # and deploy Node.js applications in production environments.
+
+# Type npm run server to start the authentication server
+
+# Type npm stop to stop server
+
+# Type npm run schema to create collections and seed data
+ -->
