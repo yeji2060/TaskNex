@@ -66,6 +66,18 @@ Claims status Log schema
     status: String,
     expense_amount: Number
 
+User Schema
+
+    fname:'String',
+    userId: 'String',
+    lname:'String',
+    email:'String',
+    password:'String',
+    phone:'String',
+    department:'String',
+    role:'String'
+
+    Please note that userId is automatic
 ---------------------------------------------------
 
 
@@ -79,6 +91,19 @@ LOCAL ROUTES
 
 -------------------------------------------------
 ONLINE ROUTES
+https://tasknexauth.onrender.com/register 
+
+this is a post call to register a User or staff
+
+
+https://tasknexauth.onrender.com/login 
+
+this is a post call to login a registered user
+
+https://tasknexauth.onrender.com/userInfo 
+
+this is a result of a successful login it can be stored in a local Storage or session Storage to keep a user signed in
+
 
 ------------------------------------------------
  -->
