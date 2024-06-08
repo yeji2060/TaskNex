@@ -1,0 +1,84 @@
+<!-- # run npm install to install all dependencies
+
+--------------------------------
+VERY IMPORTANT
+# Install PM2 with "npm install pm2 -g" which keeps the backend server running (A replacement for nodemon).
+    # PM2 is a process manager for Node.js applications. It allows you to easily manage, monitor, 
+    # and deploy Node.js applications in production environments.
+-------------------------------
+
+
+# Type npm run auth to start the authentication server
+
+# Type "npm run stopauth" to stop server
+
+# Type "npm run schema" to create collections and seed data
+
+# Type "npm run dev" to start the Backend Server
+
+# Type "npm run stopdev" to stop the Backend Server
+
+-----------------------------------------------------
+SCHEMA:
+
+events Schema
+
+    title: String,
+    short_desc: String,
+    details: String,
+    submitted_by: String,
+    submitted_at: String,
+    status: String,
+    due_date: String,
+    priority: String,
+    image_urls: String,
+    last_updated: String
+
+
+Claims schema
+  
+    title: String,
+    short_desc: String,
+    details: String,
+    submitted_by: String,
+    submitted_at: String,
+    status: String,
+    due_date: String,
+    priority: String,
+    expense_amount: Number,
+    comments: String,
+    last_updated: String
+  
+
+Events status Logs Schema 
+  
+    title: String,
+    short_desc: String,
+    submitted_at: String,
+    status: String
+
+
+Claims status Log schema
+  
+    title: String,
+    short_desc: String,
+    submitted_at: String,
+    status: String,
+    expense_amount: Number
+
+---------------------------------------------------
+
+
+
+You can use any of these routes.
+---------------------------------------------------
+LOCAL ROUTES
+
+
+--------------------------------------------------
+
+-------------------------------------------------
+ONLINE ROUTES
+
+------------------------------------------------
+ -->
