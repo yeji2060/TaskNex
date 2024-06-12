@@ -23,7 +23,8 @@ db.once('open', async function() {
     due_date: String,
     priority: String,
     image_urls: String,
-    last_updated: String
+    last_updated: String,
+    userId: String
   });
 
   // Claims schema
@@ -38,7 +39,8 @@ db.once('open', async function() {
     priority: String,
     expense_amount: Number,
     comments: String,
-    last_updated: String
+    last_updated: String,
+    userId: String
   });
 
   // Define the Events_status_LogSchema schema
@@ -98,7 +100,8 @@ db.once('open', async function() {
       due_date: new Date().toISOString(), 
       priority: 'High', 
       image_urls: 'http://example.com/image1.jpg', 
-      last_updated: new Date().toISOString() 
+      last_updated: new Date().toISOString(),
+      userId: 1001
     },
     { 
       title: 'Event 2', 
@@ -110,7 +113,8 @@ db.once('open', async function() {
       due_date: new Date().toISOString(), 
       priority: 'Medium', 
       image_urls: 'http://example.com/image2.jpg', 
-      last_updated: new Date().toISOString() 
+      last_updated: new Date().toISOString(),
+      userId: 1002
     },
     { 
       title: 'Event 3', 
@@ -122,7 +126,8 @@ db.once('open', async function() {
       due_date: new Date().toISOString(), 
       priority: 'Low', 
       image_urls: 'http://example.com/image3.jpg', 
-      last_updated: new Date().toISOString() 
+      last_updated: new Date().toISOString(),
+      userId: 1003
     }
   ];
 
@@ -138,7 +143,8 @@ db.once('open', async function() {
       priority: 'High', 
       expense_amount: 1000, 
       comments: 'Comments for Claim 1', 
-      last_updated: new Date().toISOString() 
+      last_updated: new Date().toISOString(),
+      userId: 1001
     },
     { 
       title: 'Claim 2', 
@@ -151,7 +157,8 @@ db.once('open', async function() {
       priority: 'Medium', 
       expense_amount: 500, 
       comments: 'Comments for Claim 2', 
-      last_updated: new Date().toISOString() 
+      last_updated: new Date().toISOString(),
+      userId: 1002
     },
     { 
       title: 'Claim 3', 
@@ -164,7 +171,8 @@ db.once('open', async function() {
       priority: 'Low', 
       expense_amount: 300, 
       comments: 'Comments for Claim 3', 
-      last_updated: new Date().toISOString() 
+      last_updated: new Date().toISOString(),
+      userId: 1003
     }
   ];
 

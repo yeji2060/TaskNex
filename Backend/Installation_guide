@@ -32,7 +32,8 @@ events Schema
     due_date: String,
     priority: String,
     image_urls: String,
-    last_updated: String
+    last_updated: String,
+    userId: string
 
 
 Claims schema
@@ -47,7 +48,8 @@ Claims schema
     priority: String,
     expense_amount: Number,
     comments: String,
-    last_updated: String
+    last_updated: String,
+    userId: string
   
 
 Events status Logs Schema 
@@ -66,7 +68,7 @@ Claims status Log schema
     status: String,
     expense_amount: Number
 
-User Schema
+user Schema
 
     fname:'String',
     userId: 'String',

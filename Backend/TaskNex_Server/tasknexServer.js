@@ -229,6 +229,163 @@ TaskNexApp.post('/ClaimsStatusLogPost',(req,res)=>{
 	})
 })
 
+// Aggregation query to get a single user's data with events and claims
+TaskNexApp.get('/user/:userId', async (req, res) => {
+    const userId = req.params.userId;
+
+    try {
+        const result = await db.collection('users').aggregate([
+            {
+                $match: {
+                    userId: userId
+                }
+            },
+            {
+                $lookup: {
+                    from: "eventsIdeas",
+                    let: { userId: "$userId" },
+                    pipeline: [
+                        { $match: { $expr: { $eq: ["$submitted_by", "$$userId"] } } },
+                        { $project: { title: 1, short_desc: 1, due_date: 1, status: 1 } }
+                    ],
+                    as: "userEvents"
+                }
+            },
+            {
+                $lookup: {
+                    from: "claims",
+                    let: { userId: "$userId" },
+                    pipeline: [
+                        { $match: { $expr: { $eq: ["$submitted_by", "$$userId"] } } },
+                        { $project: { title: 1, expense_amount: 1, status: 1, due_date: 1 } }
+                    ],
+                    as: "userClaims"
+                }
+            },
+            {
+                $unwind: {
+                    path: "$userEvents",
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+            {
+                $unwind: {
+                    path: "$userClaims",
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+            {
+                $group: {
+                    _id: "$userId",
+                    fname: { $first: "$fname" },
+                    lname: { $first: "$lname" },
+                    email: { $first: "$email" },
+                    phone: { $first: "$phone" },
+                    department: { $first: "$department" },
+                    role: { $first: "$role" },
+                    events: { $push: "$userEvents" }, // Push events into an array
+                    claims: { $push: "$userClaims" }  // Push claims into an array
+                }
+            },
+            {
+                $project: {
+                    _id: 0, // Exclude _id field
+                    userId: "$_id",
+                    fname: 1,
+                    lname: 1,
+                    email: 1,
+                    phone: 1,
+                    department: 1,
+                    role: 1,
+                    events: 1,
+                    claims: 1
+                }
+            }
+        ]).toArray();
+
+        res.json(result);
+    } catch (err) {
+        console.error("Error:", err);
+        res.status(500).send("Internal Server Error");
+    }
+});
+
+
+TaskNexApp.get('/usersWithEventsAndClaims', async (req, res) => {
+    try {
+        const result = await db.collection('users').aggregate([
+            {
+                $lookup: {
+                    from: "events",
+                    let: { userId: "$userId" },
+                    pipeline: [
+                        { $match: { $expr: { $eq: ["$submitted_by", "$$userId"] } } },
+                        { $project: { title: 1, short_desc: 1, due_date: 1, priority: 1 } }
+                    ],
+                    as: "userEvents"
+                }
+            },
+            {
+                $lookup: {
+                    from: "claims",
+                    let: { userId: "$userId" },
+                    pipeline: [
+                        { $match: { $expr: { $eq: ["$submitted_by", "$$userId"] } } },
+                        { $project: { title: 1, expense_amount: 1, status: 1, due_date: 1 } }
+                    ],
+                    as: "userClaims"
+                }
+            },
+            {
+                $unwind: {
+                    path: "$userEvents",
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+            {
+                $unwind: {
+                    path: "$userClaims",
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+            {
+                $group: {
+                    _id: "$userId",
+                    fname: { $first: "$fname" },
+                    lname: { $first: "$lname" },
+                    email: { $first: "$email" },
+                    phone: { $first: "$phone" },
+                    department: { $first: "$department" },
+                    role: { $first: "$role" },
+                    events: { $push: "$userEvents" }, // Push events into an array
+                    claims: { $push: "$userClaims" }  // Push claims into an array
+                }
+            },
+            {
+                $project: {
+                    _id: 0, // Exclude _id field
+                    userId: "$_id",
+                    fname: 1,
+                    lname: 1,
+                    email: 1,
+                    phone: 1,
+                    department: 1,
+                    role: 1,
+                    events: 1,
+                    claims: 1
+                }
+            }
+        ]).toArray();
+
+        res.json(result);
+    } catch (err) {
+        console.error("Error:", err);
+        res.status(500).send("Internal Server Error");
+    }
+});
+
+
+
 
 MongoClient.connect(MongoOnline, (err, client) => {
     if(err) console.log("error while connecting");
