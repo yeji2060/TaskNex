@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import 'react-responsive-modal/styles.css';
-import './BarReport.css';
 import { Modal } from 'react-responsive-modal';
 import { useHistory } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
@@ -57,6 +56,7 @@ const Adlogin = () => {
                     const data = await res.json();
                     localStorage.setItem('userdata', data.name);
                     localStorage.setItem('userRole', data.role);
+                    localStorage.setItem('userId', data.userId);
                     setrole(data.role);
                     if (data.role === 'Admin') {
                         history.push('/');
