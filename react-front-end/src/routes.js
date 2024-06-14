@@ -2,7 +2,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Dashboard from './components/Dashboard';
-import TaskModule from './components/TaskModule'; // Make sure the path is correct
+import TaskModule from './components/NewTaskModule'; 
 
 const AppRoutes = () => {
   return (
@@ -17,3 +17,4 @@ const AppRoutes = () => {
 };
 
 export default AppRoutes;
+
