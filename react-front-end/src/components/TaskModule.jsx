@@ -7,8 +7,8 @@ import {
   Grid,
   MenuItem,
   Button,
-  IconButton,
   Box,
+  IconButton,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { Close as CloseIcon } from "@mui/icons-material";
@@ -16,26 +16,43 @@ import useMediaQuery from "@mui/material/useMediaQuery";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+
 import "./../TaskModule.css";
 
-const NewTaskModule = ({ open, onClose }) => {
+const TaskModule = ({ task, open, onClose }) => {
   const [dueDate, setDueDate] = useState(null);
+  const [isEditMode, setIsEditMode] = useState(false);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
+
   const handleSave = () => {
-    // Implement save functionality
-    onClose();
+    setIsEditMode(false);
   };
 
+  const handleEdit = () => {
+    setIsEditMode(true);
+  };
+
+  const handleDelete = () => {};
+
   const handleCancel = () => {
-    onClose();
+    if (isEditMode) {
+      setIsEditMode(false);
+    } else {
+      onClose();
+    }
   };
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
+    <Dialog
+      open={open}
+      onClose={onClose}
+      maxWidth="md"
+      fullWidth
+    >
       <DialogTitle>
-        Make a new Task{" "}
+        Task Details
         <IconButton
           aria-label="close"
           onClick={onClose}
@@ -58,7 +75,8 @@ const NewTaskModule = ({ open, onClose }) => {
                 select
                 variant="outlined"
                 className="lightGreyDefaultValue"
-                defaultValue="-"
+                defaultValue={task.taskType || "-"}
+                disabled={!isEditMode}
               >
                 <MenuItem value="-">-</MenuItem>
                 <MenuItem value="Event Idea">Event Idea</MenuItem>
@@ -72,6 +90,7 @@ const NewTaskModule = ({ open, onClose }) => {
                 variant="outlined"
                 className="lightGreyDefaultValue"
                 defaultValue="Title"
+                disabled={!isEditMode}
               />
             </Grid>
             <Grid item xs={12} sm={6}>
@@ -82,6 +101,7 @@ const NewTaskModule = ({ open, onClose }) => {
                 variant="outlined"
                 value="High"
                 className="lightGreyDefaultValue"
+                disabled={!isEditMode}
               >
                 <MenuItem value="Low">Low</MenuItem>
                 <MenuItem value="Medium">Medium</MenuItem>
@@ -96,6 +116,7 @@ const NewTaskModule = ({ open, onClose }) => {
                 type="number"
                 defaultValue="138"
                 className="lightGreyDefaultValue"
+                disabled={!isEditMode}
               />
             </Grid>
             <Grid item xs={12} sm={6}>
@@ -105,12 +126,13 @@ const NewTaskModule = ({ open, onClose }) => {
                   label="Due Date"
                   value={dueDate}
                   onChange={(newValue) => setDueDate(newValue)}
+                  inputFormat="MM/DD/YYYY"
+                  disabled={!isEditMode}
+                  InputProps={{
+                    readOnly: !isEditMode,
+                  }}
                   renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      fullWidth
-                      className="lightGreyDefaultValue"
-                    />
+                    <TextField {...params} className="lightGreyDefaultValue" />
                   )}
                 />
               </LocalizationProvider>
@@ -122,6 +144,7 @@ const NewTaskModule = ({ open, onClose }) => {
                 variant="outlined"
                 defaultValue="less than 10 words"
                 className="lightGreyDefaultValue"
+                disabled={!isEditMode}
               />
             </Grid>
             <Grid item xs={12}>
@@ -133,6 +156,7 @@ const NewTaskModule = ({ open, onClose }) => {
                 rows={4}
                 defaultValue="Type the details"
                 className="lightGreyDefaultValue"
+                disabled={!isEditMode}
               />
             </Grid>
             <Grid
@@ -142,26 +166,54 @@ const NewTaskModule = ({ open, onClose }) => {
               spacing={2}
               justifyContent="space-between"
             >
-              <Grid item xs={6}>
-                <Button
-                  fullWidth
-                  variant="outlined"
-                  color="primary"
-                  onClick={handleCancel}
-                >
-                  Cancel
-                </Button>
-              </Grid>
-              <Grid item xs={6}>
-                <Button
-                  fullWidth
-                  variant="contained"
-                  color="primary"
-                  onClick={handleSave}
-                >
-                  Save
-                </Button>
-              </Grid>
+              {isEditMode ? (
+                <>
+                  <Grid item xs={6}>
+                    <Button
+                      fullWidth
+                      variant="contained"
+                      color="primary"
+                      onClick={handleSave}
+                    >
+                      Save
+                    </Button>
+                  </Grid>
+                  <Grid item xs={6}>
+                    <Button
+                      fullWidth
+                      variant="outlined"
+                      color="primary"
+                      onClick={handleCancel}
+                    >
+                      Cancel
+                    </Button>
+                  </Grid>
+                </>
+              ) : (
+                <>
+                  {" "}
+                  <Grid item xs={6}>
+                    <Button
+                      fullWidth
+                      variant="contained"
+                      color="primary"
+                      onClick={handleEdit}
+                    >
+                      Edit
+                    </Button>
+                  </Grid>
+                  <Grid item xs={6}>
+                    <Button
+                      fullWidth
+                      variant="contained"
+                      color="error"
+                      onClick={handleDelete}
+                    >
+                      Delete
+                    </Button>
+                  </Grid>
+                </>
+              )}
             </Grid>
           </Grid>
         </Box>
@@ -170,4 +222,4 @@ const NewTaskModule = ({ open, onClose }) => {
   );
 };
 
-export default NewTaskModule;
+export default TaskModule;

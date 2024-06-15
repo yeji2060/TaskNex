@@ -1,0 +1,208 @@
+<!-- # run npm install to install all dependencies
+
+--------------------------------
+VERY IMPORTANT
+# Install PM2 with "npm install pm2 -g" which keeps the backend server running (A replacement for nodemon).
+    # PM2 is a process manager for Node.js applications. It allows you to easily manage, monitor, 
+    # and deploy Node.js applications in production environments.
+-------------------------------
+
+
+# Type npm run auth to start the authentication server
+
+# Type "npm run stopauth" to stop server
+
+# Type "npm run schema" to create collections and seed data
+
+# Type "npm run dev" to start the Backend Server
+
+# Type "npm run stopdev" to stop the Backend Server
+
+-----------------------------------------------------
+SCHEMA:
+
+events Schema
+
+    title: String,
+    short_desc: String,
+    details: String,
+    submitted_by: String,
+    submitted_at: String,
+    status: String,
+    due_date: String,
+    priority: String,
+    image_urls: String,
+    last_updated: String,
+    userId: string
+
+
+Claims schema
+  
+    title: String,
+    short_desc: String,
+    details: String,
+    submitted_by: String,
+    submitted_at: String,
+    status: String,
+    due_date: String,
+    priority: String,
+    expense_amount: Number,
+    comments: String,
+    last_updated: String,
+    userId: string
+  
+
+Events status Logs Schema 
+  
+    title: String,
+    short_desc: String,
+    submitted_at: String,
+    status: String
+
+
+Claims status Log schema
+  
+    title: String,
+    short_desc: String,
+    submitted_at: String,
+    status: String,
+    expense_amount: Number
+
+user Schema
+
+    fname:'String',
+    userId: 'String',
+    lname:'String',
+    email:'String',
+    password:'String',
+    phone:'String',
+    department:'String',
+    role:'String'
+
+    Please note that userId is automatic
+---------------------------------------------------
+
+
+
+You can use any of these routes.
+---------------------------------------------------
+LOCAL ROUTES
+
+
+--------------------------------------------------
+
+-------------------------------------------------
+ONLINE ROUTES
+
+https://tasknexauth.onrender.com/
+this is the root of the server
+
+
+https://tasknexauth.onrender.com/register 
+
+this is a post call to register a User or staff
+
+
+https://tasknexauth.onrender.com/login 
+
+this is a post call to login a registered user
+
+https://tasknexauth.onrender.com/userInfo 
+
+this is a result of a successful login it can be stored in a local Storage or session Storage to keep a user signed in
+
+
+https://tasknexserver.onrender.com/
+this is the root of the server
+
+
+https://tasknexserver.onrender.com/getEventIdeas
+
+this api will get all the events ideas 
+
+
+https://tasknexserver.onrender.com/getEventIdeas?user=
+
+this api will get all the events ideas of a userId (provide the userId number after the = signs)
+
+
+https://tasknexserver.onrender.com/getEventIdeas?userDept=
+
+this api will get all the events ideas of a department (provide the department after the = signs)
+
+
+https://tasknexserver.onrender.com/getClaims
+
+this api will get all the claims
+
+
+https://tasknexserver.onrender.com/getClaims?userClaims=
+
+this api will get all the claims of a userId (provide the userId number after the = signs)
+
+
+https://tasknexserver.onrender.com/getClaims?claimsByDept=
+
+this api will get all the claims of a department (provide the department after the = signs)
+
+
+https://tasknexserver.onrender.com/insertEvent
+
+this api will post an event into the database
+
+
+https://tasknexserver.onrender.com/expenseClaim
+
+this api will post a claim into the database
+
+
+https://tasknexserver.onrender.com/editEvent/:id
+
+this api will edit an event. (Provide the userId (/:id))
+
+
+https://tasknexserver.onrender.com/editClaim/:id
+
+this api will edit a claim. (Provide the userId (/:id))
+
+
+https://tasknexserver.onrender.com/delEvent/:id
+
+this api will delete an event. (Provide the _id from the data)
+
+
+https://tasknexserver.onrender.com/delClaim/:id
+
+this api will delete a claim. (Provide the _id from the data)
+
+
+https://tasknexserver.onrender.com/getEventsStatusLog
+
+this api will get all events log.
+
+
+https://tasknexserver.onrender.com/getEventsStatusLog?eventsRequests=
+
+this api will get an event log (Provide the title of the event)
+
+
+https://tasknexserver.onrender.com/getClaimsStatusLog
+
+this api will get all claims log.
+
+
+https://tasknexserver.onrender.com/getEventsStatusLog?ClaimRequest=
+
+this api will get a claim log (Provide the title of the claim)
+
+
+https://tasknexserver.onrender.com/EventsStatusLogPost
+
+this api will post an event status log (It should be added when the status of an event changes)
+
+
+https://tasknexserver.onrender.com/ClaimsStatusLogPost
+
+this api will post a claim status log (It should be added when the status of a claim changes)
+------------------------------------------------
+ -->

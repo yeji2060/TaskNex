@@ -1,0 +1,29 @@
+{
+  "name": "tasknexlogin",
+  "version": "1.0.0",
+  "description": "Application Access Control",
+  "main": "index.js",
+  "scripts": {
+    "start": "node app.js",
+    "auth": "pm2 start app.js --watch",
+    "stopauth": "pm2 stop app.js --watch",
+    "schema": "node schema.js"
+  },
+  "keywords": [
+    "Access",
+    "Control"
+  ],
+  "author": "EA, Yeji and Victor",
+  "license": "ISC",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "body-parser": "^1.19.1",
+    "cors": "^2.8.5",
+    "express": "^4.17.2",
+    "jsonwebtoken": "^8.5.1",
+    "mongodb": "^6.7.0",
+    "mongoose": "^6.1.6",
+    "nodemon": "^2.0.15",
+    "uuid": "^9.0.1"
+  }
+}
