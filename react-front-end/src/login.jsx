@@ -1,55 +1,67 @@
-import React, { useState } from 'react';
-import { TextField, Button, Grid, Typography, Link, Container } from '@mui/material';
+import React, { useState } from "react";
+import {
+  TextField,
+  Button,
+  Grid,
+  Typography,
+  Link,
+  Container,
+} from "@mui/material";
+import { useNavigate } from "react-router-dom";
 
 const LoginPage = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [role, setrole] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [role, setrole] = useState("");
+  const [userId, setuserId] = useState("");
+  const [userFname, setuserFname] = useState("");
   const loginUrl = "https://tasknexauth.onrender.com/api/auth/login";
   const getUserData = "https://tasknexauth.onrender.com/api/auth/userinfo";
+  const navigate = useNavigate();
 
   const handleLogin = async () => {
-      try {
-          const msg = {
-              password,
-              email,
-          };
-          const res = await fetch(loginUrl, {
-              method: 'POST',
-              headers: {
-                  'accept': 'application/json',
-                  'content-type': 'application/json'
-              },
-              body: JSON.stringify(msg)
-          });
+    try {
+      const msg = {
+        password,
+        email,
+      };
+      const res = await fetch(loginUrl, {
+        method: "POST",
+        headers: {
+          accept: "application/json",
+          "content-type": "application/json",
+        },
+        body: JSON.stringify(msg),
+      });
 
+      const data = await res.json();
+      console.log(data.auth, data.auth);
+      if (data.auth === false) {
+        alert(data.token);
+      } else {
+        console.log("data.token", data.token);
+        localStorage.setItem("rtk", data.token);
+        setTimeout(async () => {
+          const res = await fetch(getUserData, {
+            method: "GET",
+            headers: {
+              "x-access-token": localStorage.getItem("rtk"),
+            },
+          });
           const data = await res.json();
-          if (data.auth === false) {
-              alert(data.token);
-          } else {
-              localStorage.setItem('rtk', data.token);
-              setTimeout(async () => {
-                  const res = await fetch(getUserData, {
-                      method: 'GET',
-                      headers: {
-                          'x-access-token': localStorage.getItem('rtk')
-                      }
-                  });
-                  const data = await res.json();
-                  localStorage.setItem('userdata', data.name);
-                  localStorage.setItem('userRole', data.role);
-                  localStorage.setItem('userId', data.userId);
-                  setrole(data.role);
-                  if (data.role === 'Admin') {
-                      // history.push('/');
-                  } else if(data.role === 'User') {
-                      // history.push('/task/:id');
-                  }
-              }, 1000);
-          }
-      } catch (e) {
-          console.log(e);
+
+              
+          console.log("data return", data);
+          localStorage.setItem("userId", data.userId);
+          localStorage.setItem("userRole", data.role);
+          localStorage.setItem("userFname", data.fname);
+
+          navigate("/");
+        }, 1000);
       }
+    } catch (e) {
+      console.log(e);
+    }
   };
 
   return (
@@ -77,7 +89,12 @@ const LoginPage = () => {
           />
         </Grid>
         <Grid item xs={12}>
-          <Button fullWidth variant="contained" color="primary" onClick={handleLogin}>
+          <Button
+            fullWidth
+            variant="contained"
+            color="primary"
+            onClick={handleLogin}
+          >
             Sign In
           </Button>
         </Grid>

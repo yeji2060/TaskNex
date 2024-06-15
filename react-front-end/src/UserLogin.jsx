@@ -76,8 +76,8 @@ const Adlogin = () => {
                 userId: uuidv4(),
                 fname:fname,
                 lname:lname,
-                email:email,
-                password:password,
+                email:useremailAD,
+                password:userpassword,
                 phone:userphone,
                 department:department,
                 role:role
@@ -170,7 +170,7 @@ const Adlogin = () => {
                             <input autoComplete="off" className="form-control mb-3 formsize51" name="fname" require placeholder="Enter First Name" value={fname} onChange={handleChange} />
                             <input autoComplete="off" className="form-control mb-3 formsize51" name="lname" require placeholder="Enter Last Name" value={lname} onChange={handleChange} />
                             <input autoComplete="off" className="form-control mb-3 formsize51" name="userphone" require placeholder="Enter Phone" value={userphone} onChange={handleChange} />
-                            <input autoComplete="off" className="form-control mb-3 formsize51" name="department" require placeholder="Enter department" value={department} onChange={handleChange} />
+                            <input autoComplete="off" className="form-control mb-3 formsize51" name="department" require placeholder="Enter Phone" value={department} onChange={handleChange} />
                             <input autoComplete="off" className="form-control mb-3 formsize51" name="useremailAD" require placeholder="Enter Email" value={useremailAD} onChange={handleChange} />
                             <input autoComplete="off" className="form-control mb-3 formsize51" name="userole" require placeholder="Enter Role" value={role} onChange={handleChange} />
                             <input type="password" autoComplete="off" className="form-control mb-3 formsize51" name="userpassword" require placeholder="Enter Password" value={userpassword} onChange={handleChange} />

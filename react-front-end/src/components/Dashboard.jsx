@@ -11,22 +11,32 @@ import TaskCards from "./TaskCards";
 import Header from "./Header";
 import NewTaskModule from "./NewTaskModule";
 import TaskModule from "./TaskModule";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 
 const Dashboard = ({ userType }) => {
   const [isTaskModuleOpen, setTaskModuleOpen] = useState(false);
   const [isTaskOpen, setIsTaskOpen] = useState(false);
   const [task, setTask] = useState({});
-  const [user, setUser] = useState(null);
+  const [userRole, setUserRole] = useState(null);
+  const [userId, setUserId] = useState(null);
+  const [userFname, setUserFname] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
-    const userData = JSON.parse(localStorage.getItem("user"));
-    if (userData) {
-      console.log("user:", userData);
-      setUser(userData);
+    console.log("db role:", localStorage.getItem("userRole"));
+    console.log("db id:", localStorage.getItem("userId"));
+    console.log("db fname:", localStorage.getItem("userFname"));
+
+    const role = localStorage.getItem("userRole");
+    const userId = localStorage.getItem("userId");
+    const userFname = localStorage.getItem("userFname");
+
+    if (role && userId && userFname) {
+      setUserRole(role);
+      setUserId(userId);
+      setUserFname(userFname);
     } else {
-      navigate("/login"); // Redirect to login if no user data found
+      navigate("/login");
     }
   }, [navigate]);
 
@@ -94,9 +104,8 @@ const Dashboard = ({ userType }) => {
 
   const handleLogout = () => {
     // Logic to handle logout
-    localStorage.removeItem("user");
     localStorage.clear();
-    console.log("Logout button clicked");
+    navigate("/login");
   };
 
   return (
