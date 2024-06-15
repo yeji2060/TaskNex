@@ -11,11 +11,11 @@ const AppRoutes = () => {
         <Route path="/" element={<Dashboard />} />
         <Route
           path="/task/:id"
-        />
+        /> 
         {/* <Route
           path="/task/:id"
           element={<TaskModule open={true} onClose={() => false}/>}
-        /> */}
+        />  */}
         {/* Add more routes as needed */}
       </Routes>
     </Router>

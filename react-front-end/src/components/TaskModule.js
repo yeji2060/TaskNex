@@ -44,6 +44,17 @@ const TaskModule = ({ task, open, onClose }) => {
     }
   };
 
+  // title: String,
+  // short_desc: String,
+  // details: String,
+  // submitted_by: String,
+  // submitted_at: String,
+  // status: String,
+  // due_date: String,
+  // priority: String,
+  // image_urls: String,
+  // last_updated: String
+
   return (
     <Dialog
       open={open}

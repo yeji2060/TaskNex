@@ -13,6 +13,7 @@ import TaskModule from "./TaskModule";
 
 const Dashboard = ({ tasks }) => {
   /**  const navigate = useNavigate();*/
+  localStorage.setItem("tasks", JSON.stringify(tasks));
 
   const [isNewTaskOpen, setIsNewTaskOpen] = useState(false);
   const [isTaskOpen, setIsTaskOpen] = useState(false);
@@ -44,6 +45,7 @@ const Dashboard = ({ tasks }) => {
     { id: 2, title: "Task 2", description: "Description of Task 2" },
     // Add more sample tasks here or fetch from a server
   ];
+  
 
   return (
     <Container>
@@ -74,3 +76,4 @@ const Dashboard = ({ tasks }) => {
 };
 
 export default Dashboard;
+
