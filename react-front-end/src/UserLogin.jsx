@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import 'react-responsive-modal/styles.css';
-import { Modal } from 'react-responsive-modal';
 import { useHistory } from 'react-router-dom';
+import {Modal} from 'react-responsive-modal';
 import { v4 as uuidv4 } from 'uuid';
 
 const loginUrl = "https://tasknexauth.onrender.com/api/auth/login";
@@ -21,7 +21,7 @@ const Adlogin = () => {
     const [userphone, setUserphone] = useState('');
     const [useremailAD, setUseremailAD] = useState('');
     const [userpassword, setUserpassword] = useState('');
-    const history = useHistory();
+    // const history = useHistory();
     
 
     const loginNow = async () => {
@@ -59,9 +59,9 @@ const Adlogin = () => {
                     localStorage.setItem('userId', data.userId);
                     setrole(data.role);
                     if (data.role === 'Admin') {
-                        history.push('/');
+                        // history.push('/');
                     } else if(data.role === 'User') {
-                        history.push('/task/:id');
+                        // history.push('/task/:id');
                     }
                 }, 1000);
             }
@@ -76,9 +76,9 @@ const Adlogin = () => {
                 userId: uuidv4(),
                 fname:fname,
                 lname:lname,
-                email:email,
-                password:password,
-                phone:phone,
+                email:useremailAD,
+                password:userpassword,
+                phone:userphone,
                 department:department,
                 role:role
             };
@@ -174,7 +174,7 @@ const Adlogin = () => {
                             <input autoComplete="off" className="form-control mb-3 formsize51" name="useremailAD" require placeholder="Enter Email" value={useremailAD} onChange={handleChange} />
                             <input autoComplete="off" className="form-control mb-3 formsize51" name="userole" require placeholder="Enter Role" value={role} onChange={handleChange} />
                             <input type="password" autoComplete="off" className="form-control mb-3 formsize51" name="userpassword" require placeholder="Enter Password" value={userpassword} onChange={handleChange} />
-                            <button disabled={useremailAD === '' || username === ''} className="btn btn-warning formsize91" onClick={registerNow}>Register</button>
+                            <button disabled={useremailAD === '' || fname === ''} className="btn btn-warning formsize91" onClick={registerNow}>Register</button>
                         </div>
                     </div>
                 </div>
