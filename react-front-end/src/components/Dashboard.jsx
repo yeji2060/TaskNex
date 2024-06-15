@@ -26,6 +26,7 @@ const Dashboard = ({ userType }) => {
     console.log("db role:", localStorage.getItem("userRole"));
     console.log("db id:", localStorage.getItem("userId"));
     console.log("db fname:", localStorage.getItem("userFname"));
+    console.log("db token:", localStorage.getItem("rtk"));
 
     const role = localStorage.getItem("userRole");
     const userId = localStorage.getItem("userId");
