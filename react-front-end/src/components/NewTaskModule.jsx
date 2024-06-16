@@ -27,19 +27,18 @@ const NewTaskModule = ({ open, onClose, id }) => {
   const [title, setTitle] = useState("");
   const [priority, setPriority] = useState("");
   const [amount, setAmount] = useState("");
-  const [dueDate, setDueDate] = useState(null);
+  const [dueDate, setDueDate] = useState(new Date());;
   const [shortDesc, setshortDesc] = useState("");
   const [details, setDetails] = useState("");
-  const [submittedAt, setSubmittedAt] = useState("");
-  const [status, setStatus] = useState("");
-  const [imageUrls, setImageUrls] = useState("");
-  const [lastUpdated, setLastUpdated] = useState("");
-  const [comments, setComments] = useState("");
+  // const [submittedAt, setSubmittedAt] = useState("");
+  // const [status, setStatus] = useState("");
+  // const [imageUrls, setImageUrls] = useState("");
+  // const [lastUpdated, setLastUpdated] = useState("");
+  // const [comments, setComments] = useState("");
   const apiBaseUrl = process.env.REACT_APP_API_BASE_URL;
   const apiPort = process.env.REACT_APP_API_PORT;
   const newEventTask = `${apiBaseUrl}:${apiPort}/insertEvent`;
   const newExpenseTask = `${apiBaseUrl}:${apiPort}/expenseClaim`;
-
 
   const handleSave = async () => {
     const newTask = {
@@ -52,7 +51,7 @@ const NewTaskModule = ({ open, onClose, id }) => {
       details: details,
       userId: userid,
       submitted_by: userid,
-      status: "Submitted",
+      status: "Pending",
       /**
       submitted_at: "",
       status: "Submitted",
@@ -93,7 +92,6 @@ const NewTaskModule = ({ open, onClose, id }) => {
       setDueDate(null);
       setshortDesc("");
       setDetails("");
-
     } catch (error) {
       console.error("Error:", error);
       alert("Failed to create a new task");
@@ -184,21 +182,15 @@ const NewTaskModule = ({ open, onClose, id }) => {
                   className="datepicker"
                   label="Due Date"
                   name="due_date"
-                  value={dueDate}
+                  selected={dueDate}
                   onChange={(date) => setDueDate(date)}
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      fullWidth
-                      className="lightGreyDefaultValue"
-                    />
-                    /**  slotProps={{
+                  slotProps={{
                     textField: {
                       fullWidth: true,
                       className: "lightGreyDefaultValue",
                     },
-                  }} need to update renderInput to slot but UI need to be address,will work on this later on */
-                  )}
+                  }}
+                  // )}
                 />
               </LocalizationProvider>
             </Grid>

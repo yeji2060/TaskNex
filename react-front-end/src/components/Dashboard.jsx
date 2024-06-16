@@ -13,7 +13,7 @@ import NewTaskModule from "./NewTaskModule";
 import TaskModule from "./TaskModule";
 import { useNavigate } from "react-router-dom";
 
-const Dashboard = ({  }) => {
+const Dashboard = ({}) => {
   const [isTaskModuleOpen, setTaskModuleOpen] = useState(false);
   const [isTaskOpen, setIsTaskOpen] = useState(false);
   const [tasks, setTasks] = useState([]);
@@ -22,6 +22,14 @@ const Dashboard = ({  }) => {
   const [userId, setUserId] = useState(null);
   const [userFname, setUserFname] = useState(null);
   const navigate = useNavigate();
+  const apiBaseUrl = process.env.REACT_APP_API_BASE_URL;
+  const apiPort = process.env.REACT_APP_API_PORT;
+  const editEvent = `${apiBaseUrl}:${apiPort}/editEvent`;
+  const editExpress = `${apiBaseUrl}:${apiPort}/expenseClaim`;
+  const deleteEvent = `${apiBaseUrl}:${apiPort}/delEvent`;
+  const delClaim = `${apiBaseUrl}:${apiPort}/delClaim`;
+
+  
 
   useEffect(() => {
     const role = localStorage.getItem("userRole");

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -16,17 +16,18 @@ import useMediaQuery from "@mui/material/useMediaQuery";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import dayjs, { Dayjs } from 'dayjs';
 
 import "./../TaskModule.css";
 
-const TaskModule = ({ task, open, onClose, userRole, onApprove, onReject, onDelete }) => {
-  const [dueDate, setDueDate] = useState(null);
+const TaskModule = ({task, open, onClose, userRole, onApprove, onReject, onDelete}) => {
+  
   const [isEditMode, setIsEditMode] = useState(false);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-  // const deleteExpnese = `${apiBaseUrl}:${apiPort}/expenseClaim`;
-  // const deleteEvent = `${apiBaseUrl}:${apiPort}/expenseClaim`;
-  console.log("task", task);
+
+  console.log('task', task);
+
 
   const handleSave = () => {
     setIsEditMode(false);
@@ -35,9 +36,6 @@ const TaskModule = ({ task, open, onClose, userRole, onApprove, onReject, onDele
   const handleEdit = () => {
     setIsEditMode(true);
   };
-
-  const handleDelete = () => {
-    };
 
   const handleCancel = () => {
     if (isEditMode) {
@@ -84,7 +82,6 @@ const TaskModule = ({ task, open, onClose, userRole, onApprove, onReject, onDele
                 variant="outlined"
                 value={task.taskType || "-"}
                 className="lightGreyDefaultValue"
-                defaultValue={task.taskType || "-"}
                 disabled={!isEditMode}
               >
                 <MenuItem value="-">-</MenuItem>
@@ -96,10 +93,8 @@ const TaskModule = ({ task, open, onClose, userRole, onApprove, onReject, onDele
               <TextField
                 fullWidth
                 label="Title"
-                name="title"
                 variant="outlined"
                 className="lightGreyDefaultValue"
-                defaultValue="Title"
                 value={task.title || "-"}
                 disabled={!isEditMode}
               />
@@ -110,7 +105,7 @@ const TaskModule = ({ task, open, onClose, userRole, onApprove, onReject, onDele
                 label="Priority"
                 select
                 variant="outlined"
-                value={task.priority|| "-"}
+                value={task.priority}
                 className="lightGreyDefaultValue"
                 disabled={!isEditMode}
               >
@@ -132,21 +127,20 @@ const TaskModule = ({ task, open, onClose, userRole, onApprove, onReject, onDele
               />
             </Grid>
             <Grid item xs={12} sm={6}>
-              <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <DatePicker
                   className="datepicker"
                   label="Due Date"
                   name="due_date"
-                  value={task.dueDate}
-                  onChange={(newValue) => setDueDate(newValue)}
-                  inputFormat="MM/DD/YYYY"
                   disabled={!isEditMode}
-                  InputProps={{
-                    readOnly: !isEditMode,
+                  value={dayjs(task.due_date)}
+                  slotProps={{
+                    textField: {
+                      fullWidth: true,
+                      className: "lightGreyDefaultValue",
+                    },
                   }}
-                  renderInput={(params) => (
-                    <TextField {...params} className="lightGreyDefaultValue" />
-                  )}
+                  // )}
                 />
               </LocalizationProvider>
             </Grid>
@@ -222,7 +216,7 @@ const TaskModule = ({ task, open, onClose, userRole, onApprove, onReject, onDele
                       fullWidth
                       variant="contained"
                       color="error"
-                      onClick={handleDelete}
+                      onClick={onDelete}
                     >
                       Delete
                     </Button>
