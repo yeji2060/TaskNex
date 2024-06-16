@@ -13,9 +13,10 @@ import NewTaskModule from "./NewTaskModule";
 import TaskModule from "./TaskModule";
 import { useNavigate } from "react-router-dom";
 
-const Dashboard = ({ userType }) => {
+const Dashboard = ({  }) => {
   const [isTaskModuleOpen, setTaskModuleOpen] = useState(false);
   const [isTaskOpen, setIsTaskOpen] = useState(false);
+  const [tasks, setTasks] = useState([]);
   const [task, setTask] = useState({});
   const [userRole, setUserRole] = useState(null);
   const [userId, setUserId] = useState(null);
@@ -23,11 +24,6 @@ const Dashboard = ({ userType }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    console.log("db role:", localStorage.getItem("userRole"));
-    console.log("db id:", localStorage.getItem("userId"));
-    console.log("db fname:", localStorage.getItem("userFname"));
-    console.log("db token:", localStorage.getItem("rtk"));
-
     const role = localStorage.getItem("userRole");
     const userId = localStorage.getItem("userId");
     const userFname = localStorage.getItem("userFname");
@@ -41,52 +37,35 @@ const Dashboard = ({ userType }) => {
     }
   }, [navigate]);
 
-  const tasks = [
-    {
-      id: 1,
-      title: "Task 1",
-      description: "Description of Task 1",
-      dueDate: "2022-10-20",
-      priority: "High",
-      status: "Submitted",
-    },
-    {
-      id: 2,
-      title: "Task 2",
-      description: "Description of Task 2",
-      dueDate: "2024-12-30",
-      priority: "Low",
-      status: "Submitted",
-    },
-    {
-      id: 3,
-      title: "Task 3",
-      description: "Description of Task 3",
-      dueDate: "2022-10-14",
-      priority: "High",
-      status: "Done",
-    },
-    {
-      id: 4,
-      title: "Task 4",
-      description: "Description of Task 4",
-      dueDate: "2022-10-11",
-      priority: "High",
-      status: "Declined",
-    },
-    {
-      id: 5,
-      title: "Task 5",
-      description: "Description of Task 5",
-      dueDate: "2022-10-17",
-      priority: "Low",
-      status: "In Progress",
-    },
-  ];
+  useEffect(() => {
+    const fetchTasks = async () => {
+      try {
+        const eventResponse = await fetch(`https://tasknexserver.onrender.com/getEventIdeas?user=${userId}`);
+        const claimResponse = await fetch(`https://tasknexserver.onrender.com/getClaims?userClaims=${userId}`);
+        
+        const eventData = await eventResponse.json();
+        const claimData = await claimResponse.json();
+        
+        // Combine event ideas and claims into a single array
+        const combinedTasks = [
+          ...eventData.map(event => ({ ...event, type: 'Event Idea' })),
+          ...claimData.map(claim => ({ ...claim, type: 'Claim' }))
+        ];
+        
+        setTasks(combinedTasks);
+      } catch (error) {
+        console.error("Failed to fetch tasks:", error);
+      }
+    };
 
-  const statuses = ["Submitted", "In Progress", "Done", "Declined"];
+    if (userId) {
+      fetchTasks();
+    }
+  }, [userId]);
 
-  const handleOpenTask = () => {
+  const statuses = ["Approved", "In Progress", "Pending", "Completed", "Rejected"];
+
+  const handleOpenTask = (task) => {
     setTask(task);
     setIsTaskOpen(true);
   };
@@ -104,39 +83,85 @@ const Dashboard = ({ userType }) => {
   };
 
   const handleLogout = () => {
-    // Logic to handle logout
     localStorage.clear();
     navigate("/login");
+  };
+
+  const updateTaskStatus = async (taskId, newStatus) => {
+    try {
+      const response = await fetch(`https://tasknexserver.onrender.com/editEvent/${taskId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ status: newStatus }),
+      });
+
+      if (response.headers.get("content-type")?.includes("application/json")) {
+        const data = await response.json();
+        setTasks((prevTasks) =>
+          prevTasks.map((task) =>
+            task._id === taskId ? { ...task, status: newStatus } : task
+          )
+        );
+        console.log("Task status updated:", data);
+      } else {
+        const text = await response.text();
+        console.log("Task status updated:", text);
+        setTasks((prevTasks) =>
+          prevTasks.map((task) =>
+            task._id === taskId ? { ...task, status: newStatus } : task
+          )
+        );
+      }
+    } catch (error) {
+      console.error("Failed to update task status:", error);
+    }
+  };
+
+  const deleteTask = async (taskId) => {
+    try {
+      const response = await fetch(`https://tasknexserver.onrender.com/delEvent/${taskId}`, {
+        method: "DELETE",
+      });
+      const data = await response.json();
+      setTasks((prevTasks) => prevTasks.filter((task) => task._id !== taskId));
+      console.log("Task deleted:", data);
+    } catch (error) {
+      console.error("Failed to delete task:", error);
+    }
   };
 
   return (
     <Container>
       <Header
-        userType={userType}
+        userRole={userRole}
         onCreateTask={handleOpenNewTask}
         onLogout={handleLogout}
       />
 
-      <Box sx={{ display: "flex", justifyContent: "space-between", mb: 4 }}>
-        <Box>
-          <Typography variant="h6">Total Progress</Typography>
-          <Typography variant="h4">70%</Typography>
-          <Typography>Tasks completed: 700</Typography>
-          <Typography>Total tasks: 1000</Typography>
+      {userRole === 'Admin' && (
+        <Box sx={{ display: "flex", justifyContent: "space-between", mb: 4 }}>
+          <Box>
+            <Typography variant="h6">Total Progress</Typography>
+            <Typography variant="h4">70%</Typography>
+            <Typography>Tasks completed: 700</Typography>
+            <Typography>Total tasks: 1000</Typography>
+          </Box>
+          <Box>
+            <Typography variant="h6">Monthly Progress</Typography>
+            <Typography variant="h4">80%</Typography>
+            <Typography>Tasks completed: 320</Typography>
+            <Typography>Total tasks: 400</Typography>
+          </Box>
+          <Box>
+            <Typography variant="h6">Yearly Progress</Typography>
+            <Typography variant="h4">60%</Typography>
+            <Typography>Tasks completed: 1920</Typography>
+            <Typography>Total tasks: 3200</Typography>
+          </Box>
         </Box>
-        <Box>
-          <Typography variant="h6">Monthly Progress</Typography>
-          <Typography variant="h4">80%</Typography>
-          <Typography>Tasks completed: 320</Typography>
-          <Typography>Total tasks: 400</Typography>
-        </Box>
-        <Box>
-          <Typography variant="h6">Yearly Progress</Typography>
-          <Typography variant="h4">60%</Typography>
-          <Typography>Tasks completed: 1920</Typography>
-          <Typography>Total tasks: 3200</Typography>
-        </Box>
-      </Box>
+      )}
 
       <Grid container spacing={3}>
         {statuses.map((status) => (
@@ -157,8 +182,13 @@ const Dashboard = ({ userType }) => {
                           <TaskCards
                             title={task.title}
                             description={task.description}
-                            dueDate={task.dueDate}
+                            dueDate={task.due_date || task.dueDate} // Adjust key if needed
                             priority={task.priority}
+                            type={task.type}
+                            userRole={userRole}
+                            onApprove={() => updateTaskStatus(task._id, 'Approved')}
+                            onReject={() => updateTaskStatus(task._id, 'Rejected')}
+                            onDelete={() => deleteTask(task._id)}
                           />
                         </CardContent>
                       </Card>
@@ -169,13 +199,22 @@ const Dashboard = ({ userType }) => {
           </Grid>
         ))}
       </Grid>
+      
       <NewTaskModule
         task={{}}
         open={isTaskModuleOpen}
         onClose={handleCloseNewTask}
         id={userId}
       />
-      <TaskModule task={task} open={isTaskOpen} onClose={handleCloseTask} />
+       <TaskModule
+        task={task}
+        open={isTaskOpen}
+        onClose={handleCloseTask}
+        userRole={userRole}
+        onApprove={() => updateTaskStatus(task._id, 'Approved')}
+        onReject={() => updateTaskStatus(task._id, 'Rejected')}
+        onDelete={() => deleteTask(task._id)}
+      />
     </Container>
   );
 };
