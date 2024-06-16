@@ -173,6 +173,7 @@ const Dashboard = ({ userType }) => {
         task={{}}
         open={isTaskModuleOpen}
         onClose={handleCloseNewTask}
+        id={userId}
       />
       <TaskModule task={task} open={isTaskOpen} onClose={handleCloseTask} />
     </Container>
