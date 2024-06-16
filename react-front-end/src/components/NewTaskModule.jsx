@@ -79,6 +79,7 @@ const NewTaskModule = ({ open, onClose, id}) => {
       details: formData.details,
       userId: userid,
       submitted_by: userid,
+      status: "Pending",
       /**
       submitted_at: "",
       status: "Submitted",

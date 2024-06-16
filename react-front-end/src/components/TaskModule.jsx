@@ -19,11 +19,12 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 
 import "./../TaskModule.css";
 
-const TaskModule = ({ task, open, onClose }) => {
+const TaskModule = ({ task, open, onClose, userRole, onApprove, onReject, onDelete }) => {
   const [dueDate, setDueDate] = useState(null);
   const [isEditMode, setIsEditMode] = useState(false);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+
 
 
   const handleSave = () => {
@@ -214,7 +215,39 @@ const TaskModule = ({ task, open, onClose }) => {
                   </Grid>
                 </>
               )}
+
             </Grid>
+            {userRole === 'Admin' && !isEditMode && (
+              <Grid
+                item
+                xs={12}
+                container
+                spacing={2}
+                justifyContent="space-between"
+              >
+                <Grid item xs={6}>
+                  <Button
+                    fullWidth
+                    variant="contained"
+                    color="primary"
+                    onClick={onApprove}
+                  >
+                    Approve
+                  </Button>
+                </Grid>
+                <Grid item xs={6}>
+                  <Button
+                    fullWidth
+                    variant="contained"
+                    color="warning"
+                    onClick={onReject}
+                  >
+                    Reject
+                  </Button>
+                  </Grid>
+              
+              </Grid>
+            )}
           </Grid>
         </Box>
       </DialogContent>

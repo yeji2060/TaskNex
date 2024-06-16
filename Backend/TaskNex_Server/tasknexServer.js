@@ -78,8 +78,7 @@ TaskNexApp.post('/insertEvent',(req,res)=>{
 	console.log(req.body);
 	db.collection('eventsideas').insertOne(req.body,(err,result)=>{
 		if(err) throw err;
-
-		res.send({message: 'A new event was created', result});
+        res.send({message: 'A new event was created', result});
 	})
 })
 
