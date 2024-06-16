@@ -174,6 +174,7 @@ const NewTaskModule = ({ open, onClose, id}) => {
                 label="Priority"
                 name="priority"
                 select
+                value="Low"
                 variant="outlined"
                 className="lightGreyDefaultValue"
                 onChange={handleChange}
