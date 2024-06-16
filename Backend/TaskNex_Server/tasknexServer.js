@@ -87,7 +87,7 @@ TaskNexApp.post('/expenseClaim',(req,res)=>{
 	console.log(req.body);
 	db.collection('claims').insertOne(req.body,(err,result)=>{
 		if(err) throw err;
-		res.send("A new event was created", result);
+        res.send({message: 'A new event was created', result});
 	})
 })
 
@@ -117,7 +117,7 @@ TaskNexApp.put('/editEvent/:id',(req,res)=>{
         },
         
     )
-    res.send('event updated')      
+	res.send({message: 'event updated'});    
   
 })
 
@@ -147,7 +147,7 @@ TaskNexApp.put('/editClaim/:id',(req,res)=>{
         },
         
     )
-    res.send('claims updated')      
+    res.send({message: 'claim updated'})      
   
 })
 
@@ -216,7 +216,7 @@ TaskNexApp.post('/EventsStatusLogPost',(req,res)=>{
 	console.log(req.body);
 	db.collection('eventslogs').insertOne(req.body,(err,result)=>{
 		if(err) throw err;
-		res.send("A new log was added", result);
+		res.send({message: 'A new log was added'}, result);
 	})
 })
 
@@ -225,7 +225,7 @@ TaskNexApp.post('/ClaimsStatusLogPost',(req,res)=>{
 	console.log(req.body);
 	db.collection('claimslogs').insertOne(req.body,(err,result)=>{
 		if(err) throw err;
-		res.send("A new log was added", result);
+		res.send({message: 'A new log was added'}, result);
 	})
 })
 
@@ -306,7 +306,8 @@ TaskNexApp.get('/user/:userId', async (req, res) => {
         res.json(result);
     } catch (err) {
         console.error("Error:", err);
-        res.status(500).send("Internal Server Error");
+        res.status(500).send({message: 'Internal Server Error'});
+        
     }
 });
 
@@ -380,7 +381,7 @@ TaskNexApp.get('/usersWithEventsAndClaims', async (req, res) => {
         res.json(result);
     } catch (err) {
         console.error("Error:", err);
-        res.status(500).send("Internal Server Error");
+        res.status(500).send({message: 'Internal Server Error'});
     }
 });
 
