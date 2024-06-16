@@ -18,68 +18,41 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import "./../TaskModule.css";
 
-const NewTaskModule = ({ open, onClose, id}) => {
-  const userid = id|| 1002;
-  const [dueDate, setDueDate] = useState(null);
+const NewTaskModule = ({ open, onClose, id }) => {
+  const userid = id || 1002;
+
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const [taskType, setTaskType] = useState("");
   const [title, setTitle] = useState("");
   const [priority, setPriority] = useState("");
   const [amount, setAmount] = useState("");
-  const [shortDescription, setShortDescription] = useState("");
+  const [dueDate, setDueDate] = useState(null);
+  const [shortDesc, setshortDesc] = useState("");
   const [details, setDetails] = useState("");
-  const [api, setApi] = useState("");
-  const port = process.env.PORT || 8888;
-  // const newEventTask = "https://tasknexserver.onrender.com/insertEvent";
-  // const newExpenseTask = "https://tasknexserver.onrender.com/expenseClaim";
-  const newEventTask = "http://localhost:8888/insertEvent";
-  const newExpenseTask = "http://localhost:8888/expenseClaim";
+  const [submittedAt, setSubmittedAt] = useState("");
+  const [status, setStatus] = useState("");
+  const [imageUrls, setImageUrls] = useState("");
+  const [lastUpdated, setLastUpdated] = useState("");
+  const [comments, setComments] = useState("");
+  const apiBaseUrl = process.env.REACT_APP_API_BASE_URL;
+  const apiPort = process.env.REACT_APP_API_PORT;
+  const newEventTask = `${apiBaseUrl}:${apiPort}/insertEvent`;
+  const newExpenseTask = `${apiBaseUrl}:${apiPort}/expenseClaim`;
 
-  const [formData, setFormData] = useState({
-    taskType: "", // need to remove before push it to the server
-    title: "",
-    priority: "",
-    amount: 0,
-    due_date: "",
-    short_desc: "",
-    details: "",
-    submitted_by: userid,
-    submitted_at:"",
-    status:"",
-    image_urls: "",
-    last_updated: "",
-    userId: userid,
-    comments:""
-  });
-
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-    console.log("new task data", formData);
-  };
-
-  const handleDateChange = (date) => {
-    console.log("handle");
-    const d = new Date(date).toLocaleDateString("fr-FR");
-    const dateString = d.toString();
-    console.log("dateString", dateString);
-    setFormData({ ...formData, due_date: dateString });
-    console.log("typeof", typeof dateString);
-    console.log("check date", formData.due_date);
-  };
 
   const handleSave = async () => {
     const newTask = {
-      taskType: formData.taskType,
-      title: formData.title,
-      priority: formData.priority,
-      amount: formData.amount,
-      due_date: formData.due_date,
-      short_desc: formData.short_desc,
-      details: formData.details,
+      taskType: taskType,
+      title: title,
+      priority: priority,
+      amount: amount,
+      due_date: dueDate,
+      short_desc: shortDesc,
+      details: details,
       userId: userid,
       submitted_by: userid,
-      status: "Pending",
+      status: "Submitted",
       /**
       submitted_at: "",
       status: "Submitted",
@@ -88,20 +61,20 @@ const NewTaskModule = ({ open, onClose, id}) => {
       comments:"" */
     };
 
-    console.log("new task type", newTask.taskType);
+    let apiEndpoint; // Variable to hold the API endpoint
+
+    // Determine the API endpoint based on task type
     if (newTask.taskType === "Event Idea") {
-      console.log("this is event");
-      setApi(newEventTask);
+      apiEndpoint = newEventTask;
     } else if (newTask.taskType === "Expense") {
-      console.log("this is expense")
-      setApi(newExpenseTask);
+      apiEndpoint = newExpenseTask;
     } else {
       alert("Please select a task type");
       return;
     }
 
     try {
-      const response = await fetch(api, {
+      const response = await fetch(apiEndpoint, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -112,6 +85,15 @@ const NewTaskModule = ({ open, onClose, id}) => {
       const data = await response.json();
       console.log("Response:", data);
       alert("New task created successfully");
+
+      setTaskType("");
+      setTitle("");
+      setPriority("");
+      setAmount("");
+      setDueDate(null);
+      setshortDesc("");
+      setDetails("");
+
     } catch (error) {
       console.error("Error:", error);
       alert("Failed to create a new task");
@@ -150,10 +132,9 @@ const NewTaskModule = ({ open, onClose, id}) => {
                 select
                 variant="outlined"
                 className="lightGreyDefaultValue"
-                defaultValue="-"
-                onChange={handleChange}
+                value={taskType}
+                onChange={(event) => setTaskType(event.target.value)}
               >
-                <MenuItem value="-">-</MenuItem>
                 <MenuItem value="Event Idea">Event Idea</MenuItem>
                 <MenuItem value="Expense">Expense</MenuItem>
               </TextField>
@@ -163,10 +144,10 @@ const NewTaskModule = ({ open, onClose, id}) => {
                 fullWidth
                 label="Title"
                 name="title"
+                value={title}
                 variant="outlined"
                 className="lightGreyDefaultValue"
-                defaultValue=""
-                onChange={handleChange}
+                onChange={(event) => setTitle(event.target.value)}
               />
             </Grid>
             <Grid item xs={12} sm={6}>
@@ -174,11 +155,11 @@ const NewTaskModule = ({ open, onClose, id}) => {
                 fullWidth
                 label="Priority"
                 name="priority"
-                select
                 value="Low"
+                select
                 variant="outlined"
                 className="lightGreyDefaultValue"
-                onChange={handleChange}
+                onChange={(event) => setPriority(event.target.value)}
               >
                 <MenuItem value="Low">Low</MenuItem>
                 <MenuItem value="Medium">Medium</MenuItem>
@@ -190,11 +171,11 @@ const NewTaskModule = ({ open, onClose, id}) => {
                 fullWidth
                 label="Amount"
                 name="amount"
+                value={amount}
                 variant="outlined"
                 type="number"
-                defaultValue=""
                 className="lightGreyDefaultValue"
-                onChange={handleChange}
+                onChange={(event) => setAmount(event.target.value)}
               />
             </Grid>
             <Grid item xs={12} sm={6}>
@@ -204,16 +185,19 @@ const NewTaskModule = ({ open, onClose, id}) => {
                   label="Due Date"
                   name="due_date"
                   value={dueDate}
-                  onChange={(date) => {
-                    handleDateChange(date);
-                    
-                  }}
+                  onChange={(date) => setDueDate(date)}
                   renderInput={(params) => (
                     <TextField
                       {...params}
                       fullWidth
                       className="lightGreyDefaultValue"
                     />
+                    /**  slotProps={{
+                    textField: {
+                      fullWidth: true,
+                      className: "lightGreyDefaultValue",
+                    },
+                  }} need to update renderInput to slot but UI need to be address,will work on this later on */
                   )}
                 />
               </LocalizationProvider>
@@ -223,9 +207,10 @@ const NewTaskModule = ({ open, onClose, id}) => {
                 fullWidth
                 label="Short Description"
                 name="short_desc"
+                value={shortDesc}
                 variant="outlined"
                 className="lightGreyDefaultValue"
-                onChange={handleChange}
+                onChange={(event) => setshortDesc(event.target.value)}
               />
             </Grid>
             <Grid item xs={12}>
@@ -233,11 +218,12 @@ const NewTaskModule = ({ open, onClose, id}) => {
                 fullWidth
                 label="Details"
                 name="details"
+                value={details}
                 variant="outlined"
                 multiline
                 rows={4}
                 className="lightGreyDefaultValue"
-                onChange={handleChange}
+                onChange={(event) => setDetails(event.target.value)}
               />
             </Grid>
             <Grid

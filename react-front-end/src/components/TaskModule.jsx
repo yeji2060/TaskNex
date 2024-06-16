@@ -24,8 +24,9 @@ const TaskModule = ({ task, open, onClose, userRole, onApprove, onReject, onDele
   const [isEditMode, setIsEditMode] = useState(false);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-
-
+  // const deleteExpnese = `${apiBaseUrl}:${apiPort}/expenseClaim`;
+  // const deleteEvent = `${apiBaseUrl}:${apiPort}/expenseClaim`;
+  console.log("task", task);
 
   const handleSave = () => {
     setIsEditMode(false);
@@ -35,7 +36,8 @@ const TaskModule = ({ task, open, onClose, userRole, onApprove, onReject, onDele
     setIsEditMode(true);
   };
 
-  const handleDelete = () => {};
+  const handleDelete = () => {
+    };
 
   const handleCancel = () => {
     if (isEditMode) {
@@ -45,10 +47,15 @@ const TaskModule = ({ task, open, onClose, userRole, onApprove, onReject, onDele
     }
   };
 
+  const handleClose = () => {
+    setIsEditMode(false); // Reset edit mode when closing the dialog
+    onClose(); // Close the dialog
+  };
+
   return (
     <Dialog
       open={open}
-      onClose={onClose}
+      onClose={handleClose}
       maxWidth="md"
       fullWidth
     >
@@ -75,6 +82,7 @@ const TaskModule = ({ task, open, onClose, userRole, onApprove, onReject, onDele
                 label="Task"
                 select
                 variant="outlined"
+                value={task.taskType || "-"}
                 className="lightGreyDefaultValue"
                 defaultValue={task.taskType || "-"}
                 disabled={!isEditMode}
@@ -88,9 +96,11 @@ const TaskModule = ({ task, open, onClose, userRole, onApprove, onReject, onDele
               <TextField
                 fullWidth
                 label="Title"
+                name="title"
                 variant="outlined"
                 className="lightGreyDefaultValue"
                 defaultValue="Title"
+                value={task.title || "-"}
                 disabled={!isEditMode}
               />
             </Grid>
@@ -100,7 +110,7 @@ const TaskModule = ({ task, open, onClose, userRole, onApprove, onReject, onDele
                 label="Priority"
                 select
                 variant="outlined"
-                value="High"
+                value={task.priority|| "-"}
                 className="lightGreyDefaultValue"
                 disabled={!isEditMode}
               >
@@ -113,9 +123,10 @@ const TaskModule = ({ task, open, onClose, userRole, onApprove, onReject, onDele
               <TextField
                 fullWidth
                 label="Amount"
+                name="amount"
                 variant="outlined"
                 type="number"
-                defaultValue="138"
+                value={task.amount || "-"}
                 className="lightGreyDefaultValue"
                 disabled={!isEditMode}
               />
@@ -125,7 +136,8 @@ const TaskModule = ({ task, open, onClose, userRole, onApprove, onReject, onDele
                 <DatePicker
                   className="datepicker"
                   label="Due Date"
-                  value={dueDate}
+                  name="due_date"
+                  value={task.dueDate}
                   onChange={(newValue) => setDueDate(newValue)}
                   inputFormat="MM/DD/YYYY"
                   disabled={!isEditMode}
@@ -142,8 +154,9 @@ const TaskModule = ({ task, open, onClose, userRole, onApprove, onReject, onDele
               <TextField
                 fullWidth
                 label="Short Description"
+                name="short_desc"
                 variant="outlined"
-                defaultValue="less than 10 words"
+                value={task.short_desc || "-"}
                 className="lightGreyDefaultValue"
                 disabled={!isEditMode}
               />
@@ -152,10 +165,11 @@ const TaskModule = ({ task, open, onClose, userRole, onApprove, onReject, onDele
               <TextField
                 fullWidth
                 label="Details"
+                name="details"
                 variant="outlined"
                 multiline
                 rows={4}
-                defaultValue="Type the details"
+                value={task.details || "-"}
                 className="lightGreyDefaultValue"
                 disabled={!isEditMode}
               />
