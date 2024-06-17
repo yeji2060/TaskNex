@@ -12,6 +12,7 @@ import Header from "./Header";
 import NewTaskModule from "./NewTaskModule";
 import TaskModule from "./TaskModule";
 import { useNavigate } from "react-router-dom";
+import TaskPieChart from "../helper/pieChart";
 
 const Dashboard = ({}) => {
   const [isTaskModuleOpen, setTaskModuleOpen] = useState(false);
@@ -23,6 +24,7 @@ const Dashboard = ({}) => {
   const [userFname, setUserFname] = useState(null);
   const [department, setDepartment] = useState(null);
   const navigate = useNavigate();
+  const[pieChartData, setPieChartData] = useState([10, 3, 2, 5]);
   // const apiBaseUrl = process.env.REACT_APP_API_BASE_URL;
   // const apiPort = process.env.REACT_APP_API_PORT;
   // const editEvent = `${apiBaseUrl}:${apiPort}/editEvent`;
@@ -189,6 +191,9 @@ const Dashboard = ({}) => {
             <Typography variant="h4">60%</Typography>
             <Typography>Tasks completed: 1920</Typography>
             <Typography>Total tasks: 3200</Typography>
+          </Box>
+          <Box>
+            <TaskPieChart dataValues={pieChartData}/>
           </Box>
         </Box>
 
