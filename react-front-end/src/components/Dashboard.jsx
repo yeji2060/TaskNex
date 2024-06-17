@@ -12,6 +12,7 @@ import Header from "./Header";
 import NewTaskModule from "./NewTaskModule";
 import TaskModule from "./TaskModule";
 import { useNavigate } from "react-router-dom";
+import TaskPieChart from "../helper/pieChart";
 
 const Dashboard = ({}) => {
   const [isTaskModuleOpen, setTaskModuleOpen] = useState(false);
@@ -23,12 +24,13 @@ const Dashboard = ({}) => {
   const [userFname, setUserFname] = useState(null);
   const [department, setDepartment] = useState(null);
   const navigate = useNavigate();
-  const apiBaseUrl = process.env.REACT_APP_API_BASE_URL;
-  const apiPort = process.env.REACT_APP_API_PORT;
-  const editEvent = `${apiBaseUrl}:${apiPort}/editEvent`;
-  const editExpress = `${apiBaseUrl}:${apiPort}/expenseClaim`;
-  const deleteEvent = `${apiBaseUrl}:${apiPort}/delEvent`;
-  const delClaim = `${apiBaseUrl}:${apiPort}/delClaim`;
+  const[pieChartData, setPieChartData] = useState([10, 3, 2, 5]);
+  // const apiBaseUrl = process.env.REACT_APP_API_BASE_URL;
+  // const apiPort = process.env.REACT_APP_API_PORT;
+  // const editEvent = `${apiBaseUrl}:${apiPort}/editEvent`;
+  // const editExpress = `${apiBaseUrl}:${apiPort}/expenseClaim`;
+  // const deleteEvent = `${apiBaseUrl}:${apiPort}/delEvent`;
+  // const delClaim = `${apiBaseUrl}:${apiPort}/delClaim`;
 
   
 
@@ -133,6 +135,7 @@ const Dashboard = ({}) => {
   };
 
   const deleteTask = async (taskId) => {
+    console.log("Deleting task:", taskId);
     try {
       const response = await fetch(`http://localhost:8888/delEvent/${taskId}`, {
         method: "DELETE",
@@ -182,6 +185,10 @@ return (
           <Typography>Tasks completed: {approvedTasks}</Typography>
           <Typography>Total tasks: {totalTasks}</Typography>
         </Box>
+
+          <Box>
+            <TaskPieChart dataValues={pieChartData}/>
+          </Box>
       </Box>
     )}
 
