@@ -22,12 +22,12 @@ const Dashboard = ({}) => {
   const [userId, setUserId] = useState(null);
   const [userFname, setUserFname] = useState(null);
   const navigate = useNavigate();
-  const apiBaseUrl = process.env.REACT_APP_API_BASE_URL;
-  const apiPort = process.env.REACT_APP_API_PORT;
-  const editEvent = `${apiBaseUrl}:${apiPort}/editEvent`;
-  const editExpress = `${apiBaseUrl}:${apiPort}/expenseClaim`;
-  const deleteEvent = `${apiBaseUrl}:${apiPort}/delEvent`;
-  const delClaim = `${apiBaseUrl}:${apiPort}/delClaim`;
+  // const apiBaseUrl = process.env.REACT_APP_API_BASE_URL;
+  // const apiPort = process.env.REACT_APP_API_PORT;
+  // const editEvent = `${apiBaseUrl}:${apiPort}/editEvent`;
+  // const editExpress = `${apiBaseUrl}:${apiPort}/expenseClaim`;
+  // const deleteEvent = `${apiBaseUrl}:${apiPort}/delEvent`;
+  // const delClaim = `${apiBaseUrl}:${apiPort}/delClaim`;
 
   
 
@@ -129,13 +129,16 @@ const Dashboard = ({}) => {
   };
 
   const deleteTask = async (taskId) => {
+    console.log("Deleting task:", taskId);
     try {
       const response = await fetch(`https://tasknexserver.onrender.com/delEvent/${taskId}`, {
         method: "DELETE",
       });
+      
       const data = await response.json();
-      setTasks((prevTasks) => prevTasks.filter((task) => task._id !== taskId));
       console.log("Task deleted:", data);
+      setTasks((prevTasks) => prevTasks.filter((task) => task._id !== taskId));
+
     } catch (error) {
       console.error("Failed to delete task:", error);
     }

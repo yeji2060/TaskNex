@@ -25,6 +25,18 @@ const TaskModule = ({task, open, onClose, userRole, onApprove, onReject, onDelet
   const [isEditMode, setIsEditMode] = useState(false);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const [taskType, setTaskType] = useState("");
+  const [title, setTitle] = useState("");
+  const [priority, setPriority] = useState("");
+  const [amount, setAmount] = useState("");
+  const [dueDate, setDueDate] = useState(new Date());
+  const [shortDesc, setshortDesc] = useState("");
+  const [details, setDetails] = useState("");
+  const [status, setStatus] = useState("");
+    const apiBaseUrl = process.env.REACT_APP_API_BASE_URL;
+  const apiPort = process.env.REACT_APP_API_PORT;
+  const deleteEvent = `${apiBaseUrl}:${apiPort}/delEvent`;
+  const delClaim = `${apiBaseUrl}:${apiPort}/delClaim`;
 
   console.log('task review', task);
 
@@ -81,6 +93,7 @@ const TaskModule = ({task, open, onClose, userRole, onApprove, onReject, onDelet
                 select
                 variant="outlined"
                 value={task.taskType || "-"}
+                onChange={(event) => setTaskType(event.target.value)}
                 className="lightGreyDefaultValue"
                 disabled={!isEditMode}
               >

@@ -17,6 +17,7 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import "./../TaskModule.css";
+import validateFieldHelper from "./../helper/validateField";
 
 const NewTaskModule = ({ open, onClose, id }) => {
   const userid = id || 1002;
@@ -43,52 +44,42 @@ const NewTaskModule = ({ open, onClose, id }) => {
   const [titleError, setTitleError] = useState(false);
   const [priorityError, setPriorityError] = useState(false);
 
-  // const validateField = (value, setError) => {
-  //   if (!value) {
-  //     setError(true);
-  //     return false;
-  //   } else {
-  //     setError(false);
-  //     return true;
-  //   }
-  // };
+  const resetErrorStates = () => {
+    setTaskTypeError(false);
+    setTitleError(false);
+    setPriorityError(false);
+    // Add other error states if needed
+  };
 
-  // const resetErrorStates = () => {
-  //   setTaskTypeError(false);
-  //   setTitleError(false);
-  //   setPriorityError(false);
-  //   // Add other error states if needed
-  // };
-
-  // const resetAllFields = () => {
-  //   setTaskType("");
-  //   setTitle("");
-  //   setPriority("");
-  //   setAmount("");
-  //   setDueDate(new Date());
-  //   setshortDesc("");
-  //   setDetails("");
-  //   // Add other fields if needed
-  // };
+  const resetAllFields = () => {
+    setTaskType("");
+    setTitle("");
+    setPriority("");
+    setAmount("");
+    setDueDate(new Date());
+    setshortDesc("");
+    setDetails("");
+    // Add other fields if needed
+  };
 
   const handleCancel = () => {
     // Reset all fields
-    // resetAllFields();
+    resetAllFields();
     // Reset error states
-    // resetErrorStates();
+    resetErrorStates();
     onClose();
   };
 
   const handleSave = async () => {
 
-    // const isTaskTypeValid = validateField(taskType, setTaskTypeError);
-    // const isTitleValid = validateField(title, setTitleError);
-    // const isPriorityValid = validateField(priority, setPriorityError);
+    const isTaskTypeValid = validateFieldHelper(taskType, setTaskTypeError);
+    const isTitleValid = validateFieldHelper(title, setTitleError);
+    const isPriorityValid = validateFieldHelper(priority, setPriorityError);
 
       // Proceed only if all validations pass
-  // if (!isTaskTypeValid || !isTitleValid || !isPriorityValid) {
-  //   return;
-  // }
+  if (!isTaskTypeValid || !isTitleValid || !isPriorityValid) {
+    return;
+  }
 
     const newTask = {
       taskType: taskType,
@@ -134,8 +125,8 @@ const NewTaskModule = ({ open, onClose, id }) => {
       const data = await response.json();
       console.log("Response:", data);
       alert("New task created successfully");
-      // resetAllFields();
-      // resetErrorStates();
+      resetAllFields();
+      resetErrorStates();
     } catch (error) {
       console.error("Error:", error);
       alert("Failed to create a new task");
