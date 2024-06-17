@@ -7,12 +7,32 @@ import ChartDataLabels from 'chartjs-plugin-datalabels';
 
 Chart.register(ArcElement, Tooltip, Legend, ChartDataLabels);
 
-const TaskPieChart = ({ dataValues }) => {
+const TaskPieChart = ({tasks }) => {
+
+
+  console.log("tasks", tasks);
+  // console.log("task 0", tasks[0]["status"]);
+
+  const countStatuses = (tasks) => {
+    const statusCounts = { 'Submitted': 0, 'In Progress': 0, 'Approved': 0, 'Rejected': 0 };
+  
+    tasks.forEach(task => {
+      if (statusCounts.hasOwnProperty(task.status)) {
+        statusCounts[task.status]++;
+      }
+    });
+  
+    return Object.values(statusCounts);
+  };
+
+  const dataValue = countStatuses(tasks);
+  console.log("countStatuses", dataValue);
+
   const data = {
     labels: ['Submitted', 'In Progress', 'Approved', 'Rejected'],
     datasets: [
       {
-        data: dataValues,
+        data: dataValue,
         backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#FF8042'],
         hoverBackgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#FF8042'],
       },
