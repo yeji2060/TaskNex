@@ -91,7 +91,7 @@ const NewTaskModule = ({ open, onClose, id }) => {
       details: details,
       userId: userid,
       submitted_by: userid,
-      status: "Pending",
+      status: "Submitted",
       /**
       submitted_at: "",
       status: "Submitted",

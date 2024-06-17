@@ -21,6 +21,7 @@ const Dashboard = ({}) => {
   const [userRole, setUserRole] = useState(null);
   const [userId, setUserId] = useState(null);
   const [userFname, setUserFname] = useState(null);
+  const [department, setDepartment] = useState(null);
   const navigate = useNavigate();
   // const apiBaseUrl = process.env.REACT_APP_API_BASE_URL;
   // const apiPort = process.env.REACT_APP_API_PORT;
@@ -35,11 +36,13 @@ const Dashboard = ({}) => {
     const role = localStorage.getItem("userRole");
     const userId = localStorage.getItem("userId");
     const userFname = localStorage.getItem("userFname");
+    const department = localStorage.getItem("department");
 
-    if (role && userId && userFname) {
+    if (role && userId && userFname && department) {
       setUserRole(role);
       setUserId(userId);
       setUserFname(userFname);
+      setDepartment(department);
     } else {
       navigate("/login");
     }
@@ -48,19 +51,22 @@ const Dashboard = ({}) => {
   useEffect(() => {
     const fetchTasks = async () => {
       try {
-        const eventResponse = await fetch(`https://tasknexserver.onrender.com/getEventIdeas?user=${userId}`);
-        const claimResponse = await fetch(`https://tasknexserver.onrender.com/getClaims?userClaims=${userId}`);
-        
-        const eventData = await eventResponse.json();
-        const claimData = await claimResponse.json();
-        
-        // Combine event ideas and claims into a single array
-        const combinedTasks = [
-          ...eventData.map(event => ({ ...event, type: 'Event Idea' })),
-          ...claimData.map(claim => ({ ...claim, type: 'Claim' }))
-        ];
-        
-        setTasks(combinedTasks);
+        const allTasksResponse = await fetch('http://localhost:8888/tasks');
+        const allTasksData = await allTasksResponse.json(); 
+
+        // Filter tasks based on user role and department
+        let filteredTasks = allTasksData;
+        if (userRole === 'Admin') {
+          if (department === 'HR') {
+            filteredTasks = allTasksData.filter(task => task.taskType === 'Event Idea');
+          } else if (department === 'Account') {
+            filteredTasks = allTasksData.filter(task => task.taskType === 'Expense');
+          }
+        } else if (userRole === 'User') {
+          filteredTasks = allTasksData.filter(task => task.submitted_by === userId);
+        }
+
+        setTasks(filteredTasks);
       } catch (error) {
         console.error("Failed to fetch tasks:", error);
       }
@@ -69,9 +75,9 @@ const Dashboard = ({}) => {
     if (userId) {
       fetchTasks();
     }
-  }, [userId]);
+  }, [userId, userRole, department]);
 
-  const statuses = ["Approved", "In Progress", "Pending", "Completed", "Rejected"];
+  const statuses = ["Submitted", "In Progress", "Approved", "Rejected"];
 
   const handleOpenTask = (task) => {
     console.log("Task opened:", task);
@@ -98,15 +104,15 @@ const Dashboard = ({}) => {
 
   const updateTaskStatus = async (taskId, newStatus) => {
     try {
-      const response = await fetch(`https://tasknexserver.onrender.com/editEvent/${taskId}`, {
+      const response = await fetch(`http://localhost:8888/updateTaskStatus/${taskId}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ status: newStatus }),
       });
-
-      if (response.headers.get("content-type")?.includes("application/json")) {
+  
+      if (response.ok) {
         const data = await response.json();
         setTasks((prevTasks) =>
           prevTasks.map((task) =>
@@ -115,32 +121,44 @@ const Dashboard = ({}) => {
         );
         console.log("Task status updated:", data);
       } else {
-        const text = await response.text();
-        console.log("Task status updated:", text);
-        setTasks((prevTasks) =>
-          prevTasks.map((task) =>
-            task._id === taskId ? { ...task, status: newStatus } : task
-          )
-        );
+        const errorText = await response.text();
+        console.error("Failed to update task status:", errorText);
+        alert(`Failed to update task status: ${errorText}`);
       }
+      handleCloseTask();
     } catch (error) {
       console.error("Failed to update task status:", error);
+      alert(`Failed to update task status: ${error.message}`);
     }
   };
 
   const deleteTask = async (taskId) => {
     console.log("Deleting task:", taskId);
     try {
-      const response = await fetch(`https://tasknexserver.onrender.com/delEvent/${taskId}`, {
+      const response = await fetch(`http://localhost:8888/delEvent/${taskId}`, {
         method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
       });
-      
-      const data = await response.json();
-      console.log("Task deleted:", data);
-      setTasks((prevTasks) => prevTasks.filter((task) => task._id !== taskId));
-
+  
+      if (response.ok) {
+        const data = await response.json();
+        console.log("Task deleted:", data);
+        if (data.deletedCount > 0) {
+          setTasks((prevTasks) => prevTasks.filter((task) => task._id !== taskId));
+        } else {
+          console.warn("No tasks deleted, check if taskId is correct");
+        }
+      } else {
+        const errorText = await response.text();
+        console.error("Failed to delete task:", errorText);
+        alert(`Failed to delete task: ${errorText}`);
+      }
+      handleCloseTask();
     } catch (error) {
       console.error("Failed to delete task:", error);
+      alert(`Failed to delete task: ${error.message}`);
     }
   };
 
@@ -173,7 +191,10 @@ const Dashboard = ({}) => {
             <Typography>Total tasks: 3200</Typography>
           </Box>
         </Box>
+
       )}
+
+     
 
       <Grid container spacing={3}>
         {statuses.map((status) => (
@@ -194,7 +215,7 @@ const Dashboard = ({}) => {
                           <TaskCards
                             title={task.title}
                             description={task.description}
-                            dueDate={task.due_date || task.dueDate} // Adjust key if needed
+                            dueDate={task.due_date || task.dueDate} 
                             priority={task.priority}
                             type={task.type}
                             userRole={userRole}

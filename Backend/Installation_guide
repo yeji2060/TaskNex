@@ -98,16 +98,16 @@ https://tasknexauth.onrender.com/
 this is the root of the server
 
 
-https://tasknexauth.onrender.com/register 
+https://tasknexauth.onrender.com/api/auth/register
 
 this is a post call to register a User or staff
 
 
-https://tasknexauth.onrender.com/login 
+https://tasknexauth.onrender.com/api/auth/login
 
 this is a post call to login a registered user
 
-https://tasknexauth.onrender.com/userInfo 
+https://tasknexauth.onrender.com/api/auth/userInfo 
 
 this is a result of a successful login it can be stored in a local Storage or session Storage to keep a user signed in
 
