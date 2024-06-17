@@ -74,6 +74,8 @@ const Dashboard = ({}) => {
   const statuses = ["Approved", "In Progress", "Pending", "Completed", "Rejected"];
 
   const handleOpenTask = (task) => {
+    console.log("Task opened:", task);
+    setTask(task);
     setIsTaskOpen(true);
   };
 
@@ -82,7 +84,6 @@ const Dashboard = ({}) => {
   };
 
   const handleOpenNewTask = () => {
-    setTask('');
     setTaskModuleOpen(true);
   };
 
