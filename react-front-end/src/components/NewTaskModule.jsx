@@ -20,28 +20,76 @@ import "./../TaskModule.css";
 
 const NewTaskModule = ({ open, onClose, id }) => {
   const userid = id || 1002;
-
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const [taskType, setTaskType] = useState("");
   const [title, setTitle] = useState("");
   const [priority, setPriority] = useState("");
   const [amount, setAmount] = useState("");
-  const [dueDate, setDueDate] = useState(null);
+  const [dueDate, setDueDate] = useState(new Date());
   const [shortDesc, setshortDesc] = useState("");
   const [details, setDetails] = useState("");
-  const [submittedAt, setSubmittedAt] = useState("");
-  const [status, setStatus] = useState("");
-  const [imageUrls, setImageUrls] = useState("");
-  const [lastUpdated, setLastUpdated] = useState("");
-  const [comments, setComments] = useState("");
+  // const [submittedAt, setSubmittedAt] = useState("");
+  // const [status, setStatus] = useState("");
+  // const [imageUrls, setImageUrls] = useState("");
+  // const [lastUpdated, setLastUpdated] = useState("");
+  // const [comments, setComments] = useState("");
   const apiBaseUrl = process.env.REACT_APP_API_BASE_URL;
   const apiPort = process.env.REACT_APP_API_PORT;
   const newEventTask = `${apiBaseUrl}:${apiPort}/insertEvent`;
   const newExpenseTask = `${apiBaseUrl}:${apiPort}/expenseClaim`;
+  // Error state for each field
+  const [taskTypeError, setTaskTypeError] = useState(false);
+  const [titleError, setTitleError] = useState(false);
+  const [priorityError, setPriorityError] = useState(false);
 
+  const validateField = (value, setError) => {
+    if (!value) {
+      setError(true);
+      return false;
+    } else {
+      setError(false);
+      return true;
+    }
+  };
+
+  const resetErrorStates = () => {
+    setTaskTypeError(false);
+    setTitleError(false);
+    setPriorityError(false);
+    // Add other error states if needed
+  };
+
+  const resetAllFields = () => {
+    setTaskType("");
+    setTitle("");
+    setPriority("");
+    setAmount("");
+    setDueDate(new Date());
+    setshortDesc("");
+    setDetails("");
+    // Add other fields if needed
+  };
+
+  const handleCancel = () => {
+    // Reset all fields
+    resetAllFields();
+    // Reset error states
+    resetErrorStates();
+    onClose();
+  };
 
   const handleSave = async () => {
+
+    const isTaskTypeValid = validateField(taskType, setTaskTypeError);
+    const isTitleValid = validateField(title, setTitleError);
+    const isPriorityValid = validateField(priority, setPriorityError);
+
+      // Proceed only if all validations pass
+  if (!isTaskTypeValid || !isTitleValid || !isPriorityValid) {
+    return;
+  }
+
     const newTask = {
       taskType: taskType,
       title: title,
@@ -52,7 +100,7 @@ const NewTaskModule = ({ open, onClose, id }) => {
       details: details,
       userId: userid,
       submitted_by: userid,
-      status: "Submitted",
+      status: "Pending",
       /**
       submitted_at: "",
       status: "Submitted",
@@ -63,13 +111,14 @@ const NewTaskModule = ({ open, onClose, id }) => {
 
     let apiEndpoint; // Variable to hold the API endpoint
 
+  
     // Determine the API endpoint based on task type
     if (newTask.taskType === "Event Idea") {
       apiEndpoint = newEventTask;
     } else if (newTask.taskType === "Expense") {
       apiEndpoint = newExpenseTask;
     } else {
-      alert("Please select a task type");
+      console.error("Invalid task type");
       return;
     }
 
@@ -85,15 +134,8 @@ const NewTaskModule = ({ open, onClose, id }) => {
       const data = await response.json();
       console.log("Response:", data);
       alert("New task created successfully");
-
-      setTaskType("");
-      setTitle("");
-      setPriority("");
-      setAmount("");
-      setDueDate(null);
-      setshortDesc("");
-      setDetails("");
-
+      resetAllFields();
+      resetErrorStates();
     } catch (error) {
       console.error("Error:", error);
       alert("Failed to create a new task");
@@ -101,12 +143,8 @@ const NewTaskModule = ({ open, onClose, id }) => {
     onClose();
   };
 
-  const handleCancel = () => {
-    onClose();
-  };
-
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
+    <Dialog open={open} onClose={handleCancel} maxWidth="md" fullWidth>
       <DialogTitle>
         Make a new Task{" "}
         <IconButton
@@ -134,6 +172,8 @@ const NewTaskModule = ({ open, onClose, id }) => {
                 className="lightGreyDefaultValue"
                 value={taskType}
                 onChange={(event) => setTaskType(event.target.value)}
+                error={taskTypeError}
+                helperText={taskTypeError ? "Task Type is required" : ""}
               >
                 <MenuItem value="Event Idea">Event Idea</MenuItem>
                 <MenuItem value="Expense">Expense</MenuItem>
@@ -148,6 +188,8 @@ const NewTaskModule = ({ open, onClose, id }) => {
                 variant="outlined"
                 className="lightGreyDefaultValue"
                 onChange={(event) => setTitle(event.target.value)}
+                error={titleError}
+                helperText={titleError ? "Title is required" : ""}
               />
             </Grid>
             <Grid item xs={12} sm={6}>
@@ -155,11 +197,13 @@ const NewTaskModule = ({ open, onClose, id }) => {
                 fullWidth
                 label="Priority"
                 name="priority"
-                value="Low"
+                value={priority}
                 select
                 variant="outlined"
                 className="lightGreyDefaultValue"
                 onChange={(event) => setPriority(event.target.value)}
+                error={priorityError}
+                helperText={priorityError ? "Priority is required" : ""}
               >
                 <MenuItem value="Low">Low</MenuItem>
                 <MenuItem value="Medium">Medium</MenuItem>
@@ -184,21 +228,15 @@ const NewTaskModule = ({ open, onClose, id }) => {
                   className="datepicker"
                   label="Due Date"
                   name="due_date"
-                  value={dueDate}
+                  selected={dueDate}
                   onChange={(date) => setDueDate(date)}
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      fullWidth
-                      className="lightGreyDefaultValue"
-                    />
-                    /**  slotProps={{
+                  slotProps={{
                     textField: {
                       fullWidth: true,
                       className: "lightGreyDefaultValue",
                     },
-                  }} need to update renderInput to slot but UI need to be address,will work on this later on */
-                  )}
+                  }}
+                  // )}
                 />
               </LocalizationProvider>
             </Grid>
