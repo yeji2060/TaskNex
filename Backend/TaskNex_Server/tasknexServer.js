@@ -185,6 +185,45 @@ TaskNexApp.post('/insertEvent', async (req, res) => {
         }
       });
 
+      TaskNexApp.put('/editTask/:id', async (req, res) => {
+        const { id } = req.params;
+        const { taskType, title, priority, amount, due_date, short_desc, details, status } = req.body;
+      
+        try {
+          if (!ObjectId.isValid(id)) {
+            console.error('Invalid task ID:', id);
+            return res.status(400).json({ error: 'Invalid task ID' });
+          }
+      
+          const updateFields = {
+            taskType,
+            title,
+            priority,
+            amount,
+            due_date: new Date(due_date),
+            short_desc,
+            details,
+            status,
+            last_updated: new Date()
+          };
+      
+          const result = await db.collection('tasks').updateOne(
+            { _id: ObjectId(id) },
+            { $set: updateFields }
+          );
+      
+          if (result.matchedCount === 0) {
+            console.error('Task not found:', id);
+            return res.status(404).json({ error: 'Task not found' });
+          }
+      
+          res.json(result);
+        } catch (error) {
+          console.error("Error updating event:", error);
+          res.status(500).json({ error: 'Failed to update event' });
+        }
+    });
+
 
 TaskNexApp.delete('/delEvent/:id', async (req, res) => {
     const { id } = req.params;

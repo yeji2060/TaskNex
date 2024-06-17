@@ -164,40 +164,32 @@ const Dashboard = ({}) => {
     }
   };
 
-  return (
-    <Container>
-      <Header
-        userRole={userRole}
-        onCreateTask={handleOpenNewTask}
-        onLogout={handleLogout}
-      />
 
-      {userRole === 'Admin' && (
-        <Box sx={{ display: "flex", justifyContent: "space-between", mb: 4 }}>
-          <Box>
-            <Typography variant="h6">Total Progress</Typography>
-            <Typography variant="h4">70%</Typography>
-            <Typography>Tasks completed: 700</Typography>
-            <Typography>Total tasks: 1000</Typography>
-          </Box>
-          <Box>
-            <Typography variant="h6">Monthly Progress</Typography>
-            <Typography variant="h4">80%</Typography>
-            <Typography>Tasks completed: 320</Typography>
-            <Typography>Total tasks: 400</Typography>
-          </Box>
-          <Box>
-            <Typography variant="h6">Yearly Progress</Typography>
-            <Typography variant="h4">60%</Typography>
-            <Typography>Tasks completed: 1920</Typography>
-            <Typography>Total tasks: 3200</Typography>
-          </Box>
-          <Box>
-            <TaskPieChart dataValues={pieChartData}/>
-          </Box>
+// Calculate the number of approved tasks and the total number of tasks
+const totalTasks = tasks.length;
+const approvedTasks = tasks.filter(task => task.status === 'Approved').length;
+
+return (
+  <Container>
+    <Header
+      userRole={userRole}
+      onCreateTask={handleOpenNewTask}
+      onLogout={handleLogout}
+    />
+
+    {userRole === 'Admin' && (
+      <Box sx={{ display: "flex", justifyContent: "space-between", mb: 4 }}>
+        <Box>
+          <Typography variant="h6">Total Progress</Typography>
+          <Typography variant="h4">{((approvedTasks / totalTasks) * 100).toFixed(0)}%</Typography>
+          <Typography>Tasks completed: {approvedTasks}</Typography>
+          <Typography>Total tasks: {totalTasks}</Typography>
         </Box>
-
-      )}
+        <Box>
+        <TaskPieChart dataValues={pieChartData}/>
+        </Box>
+      </Box>
+    )}
 
      
 
@@ -224,6 +216,7 @@ const Dashboard = ({}) => {
                             priority={task.priority}
                             type={task.type}
                             userRole={userRole}
+                            onInProgress={() => updateTaskStatus(task._id, 'In Progress')}
                             onApprove={() => updateTaskStatus(task._id, 'Approved')}
                             onReject={() => updateTaskStatus(task._id, 'Rejected')}
                             onDelete={() => deleteTask(task._id)}
@@ -242,6 +235,7 @@ const Dashboard = ({}) => {
         task={{}}
         open={isTaskModuleOpen}
         onClose={handleCloseNewTask}
+
         id={userId}
       />
        <TaskModule
@@ -249,6 +243,7 @@ const Dashboard = ({}) => {
         open={isTaskOpen}
         onClose={handleCloseTask}
         userRole={userRole}
+        onInProgress={() => updateTaskStatus(task._id, 'In Progress')}
         onApprove={() => updateTaskStatus(task._id, 'Approved')}
         onReject={() => updateTaskStatus(task._id, 'Rejected')}
         onDelete={() => deleteTask(task._id)}

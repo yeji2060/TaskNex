@@ -16,13 +16,13 @@ import useMediaQuery from "@mui/material/useMediaQuery";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import dayjs, { Dayjs } from 'dayjs';
+import dayjs from 'dayjs';
 
 import "./../TaskModule.css";
 
-const TaskModule = ({task, open, onClose, userRole, onApprove, onReject, onDelete}) => {
-  
+const TaskModule = ({ task, open, onClose, userRole, onInProgress, onApprove, onReject, onDelete }) => {
   const [isEditMode, setIsEditMode] = useState(false);
+  const [editedTask, setEditedTask] = useState({ ...task });
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const [taskType, setTaskType] = useState("");
@@ -38,11 +38,49 @@ const TaskModule = ({task, open, onClose, userRole, onApprove, onReject, onDelet
   const deleteEvent = `${apiBaseUrl}:${apiPort}/delEvent`;
   const delClaim = `${apiBaseUrl}:${apiPort}/delClaim`;
 
-  console.log('task review', task);
+  useEffect(() => {
+    setEditedTask({ ...task });
+  }, [task]);
 
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setEditedTask((prevTask) => ({
+      ...prevTask,
+      [name]: value,
+    }));
+  };
 
-  const handleSave = () => {
-    setIsEditMode(false);
+  const handleDateChange = (date) => {
+    setEditedTask((prevTask) => ({
+      ...prevTask,
+      due_date: date.toISOString(),
+    }));
+  };
+
+  const handleSave = async () => {
+    try {
+      const response = await fetch(`http://localhost:8888/editTask/${editedTask._id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(editedTask),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log("Task updated:", data);
+        setIsEditMode(false);
+        onClose();
+      } else {
+        const errorText = await response.text();
+        console.error("Failed to update task:", errorText);
+        alert(`Failed to update task: ${errorText}`);
+      }
+    } catch (error) {
+      console.error("Failed to update task:", error);
+      alert(`Failed to update task: ${error.message}`);
+    }
   };
 
   const handleEdit = () => {
@@ -57,23 +95,13 @@ const TaskModule = ({task, open, onClose, userRole, onApprove, onReject, onDelet
     }
   };
 
-  const handleClose = () => {
-    setIsEditMode(false); // Reset edit mode when closing the dialog
-    onClose(); // Close the dialog
-  };
-
   return (
-    <Dialog
-      open={open}
-      onClose={handleClose}
-      maxWidth="md"
-      fullWidth
-    >
+    <Dialog open={open} onClose={handleCancel} maxWidth="md" fullWidth>
       <DialogTitle>
         Task Details
         <IconButton
           aria-label="close"
-          onClick={onClose}
+          onClick={handleCancel}
           sx={{
             position: "absolute",
             right: 8,
@@ -92,8 +120,9 @@ const TaskModule = ({task, open, onClose, userRole, onApprove, onReject, onDelet
                 label="Task"
                 select
                 variant="outlined"
-                value={task.taskType || "-"}
-                onChange={(event) => setTaskType(event.target.value)}
+                name="taskType"
+                value={editedTask.taskType || "-"}
+                onChange={handleChange}
                 className="lightGreyDefaultValue"
                 disabled={!isEditMode}
               >
@@ -107,8 +136,10 @@ const TaskModule = ({task, open, onClose, userRole, onApprove, onReject, onDelet
                 fullWidth
                 label="Title"
                 variant="outlined"
+                name="title"
+                value={editedTask.title || "-"}
+                onChange={handleChange}
                 className="lightGreyDefaultValue"
-                value={task.title || "-"}
                 disabled={!isEditMode}
               />
             </Grid>
@@ -118,7 +149,9 @@ const TaskModule = ({task, open, onClose, userRole, onApprove, onReject, onDelet
                 label="Priority"
                 select
                 variant="outlined"
-                value={task.priority}
+                name="priority"
+                value={editedTask.priority}
+                onChange={handleChange}
                 className="lightGreyDefaultValue"
                 disabled={!isEditMode}
               >
@@ -134,26 +167,27 @@ const TaskModule = ({task, open, onClose, userRole, onApprove, onReject, onDelet
                 name="amount"
                 variant="outlined"
                 type="number"
-                value={task.amount || "-"}
+                value={editedTask.amount || "-"}
+                onChange={handleChange}
                 className="lightGreyDefaultValue"
                 disabled={!isEditMode}
               />
             </Grid>
             <Grid item xs={12} sm={6}>
-            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <DatePicker
                   className="datepicker"
                   label="Due Date"
                   name="due_date"
+                  value={dayjs(editedTask.due_date)}
+                  onChange={handleDateChange}
                   disabled={!isEditMode}
-                  value={dayjs(task.due_date)}
                   slotProps={{
                     textField: {
                       fullWidth: true,
                       className: "lightGreyDefaultValue",
                     },
                   }}
-                  // )}
                 />
               </LocalizationProvider>
             </Grid>
@@ -163,7 +197,8 @@ const TaskModule = ({task, open, onClose, userRole, onApprove, onReject, onDelet
                 label="Short Description"
                 name="short_desc"
                 variant="outlined"
-                value={task.short_desc || "-"}
+                value={editedTask.short_desc || "-"}
+                onChange={handleChange}
                 className="lightGreyDefaultValue"
                 disabled={!isEditMode}
               />
@@ -176,7 +211,8 @@ const TaskModule = ({task, open, onClose, userRole, onApprove, onReject, onDelet
                 variant="outlined"
                 multiline
                 rows={4}
-                value={task.details || "-"}
+                value={editedTask.details || "-"}
+                onChange={handleChange}
                 className="lightGreyDefaultValue"
                 disabled={!isEditMode}
               />
@@ -213,12 +249,11 @@ const TaskModule = ({task, open, onClose, userRole, onApprove, onReject, onDelet
                 </>
               ) : (
                 <>
-                  {" "}
                   <Grid item xs={6}>
                     <Button
                       fullWidth
                       variant="contained"
-                      color="primary"
+                      color="inherit"
                       onClick={handleEdit}
                     >
                       Edit
@@ -236,7 +271,6 @@ const TaskModule = ({task, open, onClose, userRole, onApprove, onReject, onDelet
                   </Grid>
                 </>
               )}
-
             </Grid>
             {userRole === 'Admin' && !isEditMode && (
               <Grid
@@ -246,7 +280,17 @@ const TaskModule = ({task, open, onClose, userRole, onApprove, onReject, onDelet
                 spacing={2}
                 justifyContent="space-between"
               >
-                <Grid item xs={6}>
+                <Grid item xs={4}>
+                  <Button
+                    fullWidth
+                    variant="contained"
+                    color="info"
+                    onClick={onInProgress}
+                  >
+                    In Progress
+                  </Button>
+                </Grid>
+                <Grid item xs={4}>
                   <Button
                     fullWidth
                     variant="contained"
@@ -256,7 +300,7 @@ const TaskModule = ({task, open, onClose, userRole, onApprove, onReject, onDelet
                     Approve
                   </Button>
                 </Grid>
-                <Grid item xs={6}>
+                <Grid item xs={4}>
                   <Button
                     fullWidth
                     variant="contained"
@@ -265,8 +309,8 @@ const TaskModule = ({task, open, onClose, userRole, onApprove, onReject, onDelet
                   >
                     Reject
                   </Button>
-                  </Grid>
-              
+                </Grid>
+                
               </Grid>
             )}
           </Grid>
