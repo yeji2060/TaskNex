@@ -134,8 +134,7 @@ const NewTaskModule = ({ open, onClose, id }) => {
       const data = await response.json();
       console.log("Response:", data);
       alert("New task created successfully");
-      // resetAllFields();
-      // resetErrorStates();
+      window.location.reload();
     } catch (error) {
       console.error("Error:", error);
       alert("Failed to create a new task");
