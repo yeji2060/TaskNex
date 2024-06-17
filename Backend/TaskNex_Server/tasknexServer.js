@@ -3,6 +3,7 @@ const TaskNexApp = express();
 const dotenv = require('dotenv');
 const mongo = require('mongodb');
 const MongoClient = mongo.MongoClient;
+const ObjectId = mongo.ObjectId
 dotenv.config();
 const MongoOnline = process.env.MongoOnline;
 const cors = require('cors')
@@ -24,6 +25,17 @@ TaskNexApp.get('/',(req,res)=>{
 })
 
 //return all Tasks
+
+TaskNexApp.get('/tasks', async (req, res) => {
+    try {
+      const tasks = await db.collection('tasks').find({}).toArray();
+      res.json(tasks);
+    } catch (error) {
+      console.error("Error fetching tasks:", error);
+      res.status(500).json({ error: 'Failed to fetch tasks' });
+    }
+  });
+
 TaskNexApp.get('/getEventIdeas', (req,res)=> {
     let query = {};
     console.log(req.query.id)
@@ -73,105 +85,133 @@ TaskNexApp.get('/getClaims', (req,res)=> {
     })
 })
 
-// Create a event
-TaskNexApp.post('/insertEvent',(req,res)=>{
-	console.log(req.body);
-	db.collection('eventsideas').insertOne(req.body,(err,result)=>{
-		if(err) throw err;
-        res.send({message: 'A new event was created', result});
-	})
-})
 
-// Create an Expense Claim
-TaskNexApp.post('/expenseClaim',(req,res)=>{
-	console.log(req.body);
-	db.collection('claims').insertOne(req.body,(err,result)=>{
-		if(err) throw err;
-        res.send({message: 'A new event was created', result});
-	})
-})
-
-
-//Edit a user's event
-TaskNexApp.put('/editEvent/:id',(req,res)=>{
-    console.log(req.params.id);
-    let id = (req.params.id)
-    db.collection('eventsideas').updateOne(
-        {_id:id},
-        {
-            $set: {
-                title:req.body.title,
-                short_desc:req.body.short_desc,
-                details:req.body.details,
-                submitted_by:req.body.submitted_by,
-                submitted_at:req.body.submitted_at,
-                status:req.body.status,
-                due_date:req.body.due_date,
-                priority:req.body.priority,
-                image_urls:req.body.image_urls,
-                comments:req.body.comments,
-                last_updated:req.body.last_updated
-
-                    
-            }
-        },
-        
-    )
-	res.send({message: 'event updated'});    
+TaskNexApp.post('/insertEvent', async (req, res) => {
+    const { taskType, title, priority, amount, due_date, short_desc, details, userId, submitted_by, status } = req.body;
   
-})
-
-
-//Edit a user's Expense Claim
-TaskNexApp.put('/editClaim/:id',(req,res)=>{
-    console.log(req.params.id);
-    let id = (req.params.id)
-    db.collection('claims').updateOne(
-        {_id:id},
-        {
-            $set: {
-                title:req.body.title,
-                short_desc:req.body.short_desc,
-                details:req.body.details,
-                submitted_by:req.body.submitted_by,
-                submitted_at:req.body.submitted_at,
-                status:req.body.status,
-                due_date:req.body.due_date,
-                priority:req.body.priority,
-                expense_amount:req.body.expense_amount,
-                comments:req.body.comments,
-                last_updated:req.body.last_updated
-
-                    
-            }
-        },
-        
-    )
-    res.send({message: 'claim updated'})      
+    if (!taskType || !title || !priority || !due_date || !short_desc || !details || !userId || !submitted_by || !status) {
+      return res.status(400).json({ error: 'All fields are required' });
+    }
   
-})
+    const newTask = {
+      taskType,
+      title,
+      priority,
+      amount,
+      due_date: new Date(due_date),
+      short_desc,
+      details,
+      userId,
+      submitted_by,
+      status,
+      submitted_at: new Date(),
+      last_updated: new Date(),
+      image_urls: [],
+      comments: []
+    };
+  
+    try {
+      const result = await db.collection('tasks').insertOne(newTask);
+      res.json(result);
+    } catch (error) {
+      console.error("Error inserting event idea:", error);
+      res.status(500).json({ error: 'Failed to insert event idea' });
+    }
+  });
+  
 
-//delete an Event
-TaskNexApp.delete('/delEvent/:id',(req,res)=>{
-    let id = req.params.id
-    db.collection('eventsideas').deleteOne(
-        {_id:id},(err,result)=>{
-        if(err) throw err;
-        res.send(result)
-    })
-})
+  TaskNexApp.post('/expenseClaim', async (req, res) => {
+    const { taskType, title, priority, amount, due_date, short_desc, details, userId, submitted_by, status } = req.body;
+  
+    if (!taskType || !title || !priority || !due_date || !short_desc || !details || !userId || !submitted_by || !status) {
+      return res.status(400).json({ error: 'All fields are required' });
+    }
+  
+    const newTask = {
+      taskType,
+      title,
+      priority,
+      amount,
+      due_date: new Date(due_date),
+      short_desc,
+      details,
+      userId,
+      submitted_by,
+      status,
+      submitted_at: new Date(),
+      last_updated: new Date(),
+      image_urls: [],
+      comments: []
+    };
+    try {
+        const result = await db.collection('tasks').insertOne(newTask);
+        res.json(result);
+      } catch (error) {
+        console.error("Error inserting expense claim:", error);
+        res.status(500).json({ error: 'Failed to insert expense claim' });
+      }
+    });
 
-//delete a Claim
-TaskNexApp.delete('/delClaim/:id',(req,res)=>{
-    let id = req.params.id
-    db.collection('claims').deleteOne(
-        {_id:id},(err,result)=>{
-        if(err) throw err;
-        res.send(result)
-    })
-})
+
+    TaskNexApp.put('/updateTaskStatus/:id', async (req, res) => {
+        const { id } = req.params;
+        const { status } = req.body;
+      
+        if (!status) {
+          return res.status(400).json({ error: 'Status is required' });
+        }
+      
+        try {
+          // Ensure the id is a valid ObjectId
+          if (!ObjectId.isValid(id)) {
+            console.error('Invalid task ID:', id);
+            return res.status(400).json({ error: 'Invalid task ID' });
+          }
+      
+          const result = await db.collection('tasks').updateOne(
+            { _id: ObjectId(id) },
+            { $set: { status: status, last_updated: new Date() } }
+          );
+      
+          if (result.matchedCount === 0) {
+            console.error('Task not found:', id);
+            return res.status(404).json({ error: 'Task not found' });
+          }
+      
+          res.json(result);
+        } catch (error) {
+          console.error("Error updating task status:", error);
+          res.status(500).json({ error: 'Failed to update task status' });
+        }
+      });
 
 
+TaskNexApp.delete('/delEvent/:id', async (req, res) => {
+    const { id } = req.params;
+    console.log(`Attempting to delete task with ID: ${id}`);
+  
+    try {
+      // Ensure the id is a valid ObjectId
+      if (!ObjectId.isValid(id)) {
+        console.error('Invalid task ID:', id);
+        return res.status(400).json({ error: 'Invalid task ID' });
+      }
+  
+      const result = await db.collection('tasks').deleteOne({ _id: ObjectId(id) });
+      console.log('Delete result:', result);
+  
+      if (result.deletedCount === 0) {
+        console.error('Task not found:', id);
+        return res.status(404).json({ error: 'Task not found' });
+      }
+  
+      res.json(result);
+    } catch (error) {
+      console.error("Error deleting task:", error);
+      res.status(500).json({ error: 'Failed to delete task' });
+    }
+  });
+  
 // View history of status changes
 
 TaskNexApp.get('/getEventsStatusLog', (req,res)=> {

@@ -55,6 +55,7 @@ const LoginPage = () => {
           localStorage.setItem("userId", data.userId);
           localStorage.setItem("userRole", data.role);
           localStorage.setItem("userFname", data.fname);
+          localStorage.setItem("department",data.department);
 
           navigate("/");
         }, 1000);
