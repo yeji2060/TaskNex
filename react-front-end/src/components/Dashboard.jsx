@@ -185,9 +185,9 @@ return (
           <Typography>Tasks completed: {approvedTasks}</Typography>
           <Typography>Total tasks: {totalTasks}</Typography>
         </Box>
-        <Box>
-        <TaskPieChart dataValues={pieChartData}/>
-        </Box>
+          <Box>
+            <TaskPieChart dataValues={pieChartData}/>
+          </Box>
       </Box>
     )}
 
