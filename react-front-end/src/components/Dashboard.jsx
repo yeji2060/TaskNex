@@ -14,7 +14,8 @@ import TaskModule from "./TaskModule";
 import { useNavigate } from "react-router-dom";
 import TaskPieChart from "../helper/pieChart";
 
-const Dashboard = ({}) => {
+
+const Dashboard = ({ }) => {
   const [isTaskModuleOpen, setTaskModuleOpen] = useState(false);
   const [isTaskOpen, setIsTaskOpen] = useState(false);
   const [tasks, setTasks] = useState([]);
@@ -24,7 +25,7 @@ const Dashboard = ({}) => {
   const [userFname, setUserFname] = useState(null);
   const [department, setDepartment] = useState(null);
   const navigate = useNavigate();
-  const[pieChartData, setPieChartData] = useState([10, 3, 2, 5]);
+  const [pieChartData, setPieChartData] = useState([10, 3, 2, 5]);
   // const apiBaseUrl = process.env.REACT_APP_API_BASE_URL;
   // const apiPort = process.env.REACT_APP_API_PORT;
   // const editEvent = `${apiBaseUrl}:${apiPort}/editEvent`;
@@ -32,7 +33,7 @@ const Dashboard = ({}) => {
   // const deleteEvent = `${apiBaseUrl}:${apiPort}/delEvent`;
   // const delClaim = `${apiBaseUrl}:${apiPort}/delClaim`;
 
-  
+
 
   useEffect(() => {
     const role = localStorage.getItem("userRole");
@@ -54,7 +55,7 @@ const Dashboard = ({}) => {
     const fetchTasks = async () => {
       try {
         const allTasksResponse = await fetch('http://localhost:8888/tasks');
-        const allTasksData = await allTasksResponse.json(); 
+        const allTasksData = await allTasksResponse.json();
 
         // Filter tasks based on user role and department
         let filteredTasks = allTasksData;
@@ -113,7 +114,7 @@ const Dashboard = ({}) => {
         },
         body: JSON.stringify({ status: newStatus }),
       });
-  
+
       if (response.ok) {
         const data = await response.json();
         setTasks((prevTasks) =>
@@ -143,7 +144,7 @@ const Dashboard = ({}) => {
           "Content-Type": "application/json",
         },
       });
-  
+
       if (response.ok) {
         const data = await response.json();
         console.log("Task deleted:", data);
@@ -165,33 +166,34 @@ const Dashboard = ({}) => {
   };
 
 
-// Calculate the number of approved tasks and the total number of tasks
-const totalTasks = tasks.length;
-const approvedTasks = tasks.filter(task => task.status === 'Approved').length;
+  // Calculate the number of approved tasks and the total number of tasks
+  const totalTasks = tasks.length;
+  const approvedTasks = tasks.filter(task => task.status === 'Approved').length;
 
-return (
-  <Container>
-    <Header
-      userRole={userRole}
-      onCreateTask={handleOpenNewTask}
-      onLogout={handleLogout}
-    />
+  return (
+    <Container maxWidth={false} sx={{ px: 5 }}>
+      <Header
+        userFname={userFname}
+        userRole={userRole}
+        onCreateTask={handleOpenNewTask}
+        onLogout={handleLogout}
+      />
 
-    {userRole === 'Admin' && (
-      <Box sx={{ display: "flex", justifyContent: "space-between", mb: 4 }}>
-        <Box>
-          <Typography variant="h6">Total Progress</Typography>
-          <Typography variant="h4">{((approvedTasks / totalTasks) * 100).toFixed(0)}%</Typography>
-          <Typography>Tasks completed: {approvedTasks}</Typography>
-          <Typography>Total tasks: {totalTasks}</Typography>
-        </Box>
-          <Box>
-            <TaskPieChart tasks={tasks}/>
+{userRole === 'Admin' && (
+        <Box sx={{ display: "flex", justifyContent: "space-between", mb: 4 , mt: 5 }}>
+          <Box sx={{ marginLeft: 10 }}>
+            <Typography variant="h5">Total Progress</Typography>
+            <Typography variant="h3">{((approvedTasks / totalTasks) * 100).toFixed(0)}%</Typography>
+            <Typography variant="h6">Tasks completed: {approvedTasks}</Typography>
+            <Typography variant="h6">Total tasks: {totalTasks}</Typography>
           </Box>
-      </Box>
-    )}
+          <Box sx={{ marginRight: 30 }}>
+            <TaskPieChart tasks={tasks} />
+          </Box>
+        </Box>
+      )}
 
-     
+
 
       <Grid container spacing={3}>
         {statuses.map((status) => (
@@ -199,7 +201,11 @@ return (
             <Box
               sx={{ border: "1px solid #ccc", borderRadius: 2, p: 2, mb: 3 }}
             >
-              <Typography variant="h6" gutterBottom>
+              <Typography
+                variant="h6"
+                gutterBottom
+                sx={{ mb: 2, fontFamily: 'Poppins, sans-serif' }}
+              >
                 {status}
               </Typography>
               <Grid container spacing={3}>
@@ -207,14 +213,21 @@ return (
                   .filter((task) => task.status === status)
                   .map((task, index) => (
                     <Grid item xs={12} key={index}>
-                      <Card onClick={() => handleOpenTask(task)} sx={{ mb: 2 }}>
+                      <Card onClick={() => handleOpenTask(task)} variant="outlined"
+                        sx={{
+                          mb: 2,
+                          transition: "box-shadow 0.3s ease-in-out",
+                          "&:hover": {
+                            boxShadow: 6, // You can adjust the value for a stronger or softer shadow
+                          },
+                        }} >
                         <CardContent>
                           <TaskCards
                             title={task.title}
-                            description={task.description}
-                            dueDate={task.due_date || task.dueDate} 
+                            description={task.short_desc}
+                            dueDate={task.due_date || task.dueDate}
                             priority={task.priority}
-                            type={task.type}
+                            taskType={task.taskType}
                             userRole={userRole}
                             onInProgress={() => updateTaskStatus(task._id, 'In Progress')}
                             onApprove={() => updateTaskStatus(task._id, 'Approved')}
@@ -230,7 +243,7 @@ return (
           </Grid>
         ))}
       </Grid>
-      
+
       <NewTaskModule
         task={{}}
         open={isTaskModuleOpen}
@@ -238,7 +251,7 @@ return (
 
         id={userId}
       />
-       <TaskModule
+      <TaskModule
         task={task}
         open={isTaskOpen}
         onClose={handleCloseTask}

@@ -1,26 +1,57 @@
 import React from 'react';
 import { AppBar, Toolbar, Typography, Button, Box } from '@mui/material';
 
-
-const Header = ({ userRole, onCreateTask, onLogout }) => {
+const Header = ({ userFname, userRole, onCreateTask, onLogout }) => {
   return (
-    <AppBar position="static">
-      <Toolbar>
-        <Typography variant="h6" sx={{ flexGrow: 1 }}>
-          Welcome back, {userRole}
-        </Typography>
-        <Box>
-
-            <Button color="inherit" onClick={onCreateTask} sx={{ mr: 2 }}>
-              Make a new task
+    <Box sx={{ mb: 3 }}>
+      <AppBar position="static" sx={{ backgroundColor: '#A7BEAE', boxShadow: 3 }}>
+        <Toolbar>
+          <Typography
+            variant="h6"
+            sx={{
+              flexGrow: 1,
+              fontFamily: 'Playwrite IS, serif',
+              color: '#fff',
+              fontWeight: 'bold',
+              
+            }}
+          >
+            Welcome back, {userFname}
+          </Typography>
+          <Box>
+           
+              <Button
+                variant="contained"
+                onClick={onCreateTask}
+                sx={{
+                  backgroundColor: '#E7E8D1',
+                  color: '#fff',
+                  mr: 2,
+                  '&:hover': {
+                    backgroundColor: '#e68900',
+                  },
+                }}
+              >
+                Make a new task
+              </Button>
+          
+            <Button
+              variant="contained"
+              onClick={onLogout}
+              sx={{
+                backgroundColor: '#f44336',
+                color: '#fff',
+                '&:hover': {
+                  backgroundColor: '#d32f2f',
+                },
+              }}
+            >
+              Log out
             </Button>
-
-          <Button color="inherit" onClick={onLogout}>
-            Log out
-          </Button>
-        </Box>
-      </Toolbar>
-    </AppBar>
+          </Box>
+        </Toolbar>
+      </AppBar>
+    </Box>
   );
 };
 
