@@ -15,7 +15,7 @@ import { useNavigate } from "react-router-dom";
 import TaskPieChart from "../helper/pieChart";
 
 
-const Dashboard = ({ }) => {
+const Dashboard = ({}) => {
   const [isTaskModuleOpen, setTaskModuleOpen] = useState(false);
   const [isTaskOpen, setIsTaskOpen] = useState(false);
   const [tasks, setTasks] = useState([]);
@@ -25,13 +25,6 @@ const Dashboard = ({ }) => {
   const [userFname, setUserFname] = useState(null);
   const [department, setDepartment] = useState(null);
   const navigate = useNavigate();
-  const [pieChartData, setPieChartData] = useState([10, 3, 2, 5]);
-  // const apiBaseUrl = process.env.REACT_APP_API_BASE_URL;
-  // const apiPort = process.env.REACT_APP_API_PORT;
-  // const editEvent = `${apiBaseUrl}:${apiPort}/editEvent`;
-  // const editExpress = `${apiBaseUrl}:${apiPort}/expenseClaim`;
-  // const deleteEvent = `${apiBaseUrl}:${apiPort}/delEvent`;
-  // const delClaim = `${apiBaseUrl}:${apiPort}/delClaim`;
 
 
 
@@ -183,7 +176,7 @@ const Dashboard = ({ }) => {
         <Box sx={{ display: "flex", justifyContent: "space-between", mb: 4 , mt: 5 }}>
           <Box sx={{ marginLeft: 10 }}>
             <Typography variant="h5">Total Progress</Typography>
-            <Typography variant="h3">{((approvedTasks / totalTasks) * 100).toFixed(0)}%</Typography>
+            <Typography variant="h3">{((approvedTasks / totalTasks) * 100).toFixed(0)|| 0}%</Typography>
             <Typography variant="h6">Tasks completed: {approvedTasks}</Typography>
             <Typography variant="h6">Total tasks: {totalTasks}</Typography>
           </Box>

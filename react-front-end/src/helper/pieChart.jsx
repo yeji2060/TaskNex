@@ -11,7 +11,6 @@ const TaskPieChart = ({tasks }) => {
 
 
   console.log("tasks", tasks);
-  // console.log("task 0", tasks[0]["status"]);
 
   const countStatuses = (tasks) => {
     const statusCounts = { 'Submitted': 0, 'In Progress': 0, 'Approved': 0, 'Rejected': 0 };
