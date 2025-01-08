@@ -30,11 +30,6 @@ const NewTaskModule = ({ open, onClose, id }) => {
   const [dueDate, setDueDate] = useState(new Date());
   const [shortDesc, setshortDesc] = useState("");
   const [details, setDetails] = useState("");
-  // const [submittedAt, setSubmittedAt] = useState("");
-  // const [status, setStatus] = useState("");
-  // const [imageUrls, setImageUrls] = useState("");
-  // const [lastUpdated, setLastUpdated] = useState("");
-  // const [comments, setComments] = useState("");
   const apiBaseUrl = process.env.REACT_APP_API_BASE_URL;
   const apiPort = process.env.REACT_APP_API_PORT;
   const newEventTask = `${apiBaseUrl}:${apiPort}/insertEvent`;
@@ -92,12 +87,7 @@ const NewTaskModule = ({ open, onClose, id }) => {
       userId: userid,
       submitted_by: userid,
       status: "Submitted",
-      /**
-      submitted_at: "",
-      status: "Submitted",
-      image_urls: "",
-      last_updated: "",
-      comments:"" */
+     
     };
 
     let apiEndpoint; // Variable to hold the API endpoint
