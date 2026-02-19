@@ -67,7 +67,7 @@ tasknex.post('/login',(req,res) => {
 })
 
 //Profile
-tasknex.get('/userInfo',(req,res) => {
+tasknex.get('/userinfo',(req,res) => {
     let token = req.headers['x-access-token']
     if(!token)  return res.status(500).send({auth:false,token:'No Token Provided'})
     // verify token
