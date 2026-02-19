@@ -20,7 +20,6 @@ const departments = ["HR", "Account", "IT", "Marketing"];
 const roles = ["User", "Admin"];
 
 const postAdminUsers = `${process.env.REACT_APP_AUTH_BASE_URL}/api/auth/register`;
-const getUserData = `${process.env.REACT_APP_AUTH_BASE_URL}/api/auth/userinfo`;
 
 const RegisterPage = () => {
   const [formData, setFormData] = useState({

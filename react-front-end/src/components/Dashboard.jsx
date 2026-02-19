@@ -22,7 +22,7 @@ const STATUS_CONFIG = {
   Rejected:      { color: "#ef4444", bg: "#fef2f2" },
 };
 
-const Dashboard = ({}) => {
+const Dashboard = () => {
   const [isTaskModuleOpen, setTaskModuleOpen] = useState(false);
   const [isTaskOpen, setIsTaskOpen] = useState(false);
   const [tasks, setTasks] = useState([]);
@@ -32,7 +32,6 @@ const Dashboard = ({}) => {
   const [userFname, setUserFname] = useState(null);
   const [department, setDepartment] = useState(null);
   const navigate = useNavigate();
-  const [pieChartData, setPieChartData] = useState([10, 3, 2, 5]);
 
   const apiBaseUrl = process.env.REACT_APP_API_BASE_URL;
 

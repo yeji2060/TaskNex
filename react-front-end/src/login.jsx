@@ -15,9 +15,6 @@ import { useNavigate } from "react-router-dom";
 const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setrole] = useState("");
-  const [userId, setuserId] = useState("");
-  const [userFname, setuserFname] = useState("");
   const loginUrl = `${process.env.REACT_APP_AUTH_BASE_URL}/api/auth/login`;
   const getUserData = `${process.env.REACT_APP_AUTH_BASE_URL}/api/auth/userinfo`;
   const navigate = useNavigate();

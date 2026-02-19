@@ -13,8 +13,6 @@ import {
   Chip,
 } from "@mui/material";
 import { Close as CloseIcon, AssignmentOutlined } from "@mui/icons-material";
-import { useTheme } from "@mui/material/styles";
-import useMediaQuery from "@mui/material/useMediaQuery";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
@@ -30,8 +28,6 @@ const STATUS_CONFIG = {
 const TaskModule = ({ task, open, onClose, userRole, onInProgress, onApprove, onReject, onDelete }) => {
   const [isEditMode, setIsEditMode] = useState(false);
   const [editedTask, setEditedTask] = useState({ ...task });
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const apiBaseUrl = process.env.REACT_APP_API_BASE_URL;
 
   useEffect(() => {

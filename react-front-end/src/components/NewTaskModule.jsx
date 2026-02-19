@@ -12,8 +12,6 @@ import {
   Divider,
 } from "@mui/material";
 import { Close as CloseIcon, AddTaskOutlined } from "@mui/icons-material";
-import { useTheme } from "@mui/material/styles";
-import useMediaQuery from "@mui/material/useMediaQuery";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
@@ -28,8 +26,6 @@ const NewTaskModule = ({ open, onClose, id }) => {
     ? `${userFname} ${userLname.charAt(0).toUpperCase()}.`
     : userFname;
 
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   const [taskType, setTaskType] = useState("");
   const [title, setTitle] = useState("");
