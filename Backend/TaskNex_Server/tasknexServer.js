@@ -87,12 +87,12 @@ TaskNexApp.get('/getClaims', (req,res)=> {
 
 
 TaskNexApp.post('/insertEvent', async (req, res) => {
-    const { taskType, title, priority, amount, due_date, short_desc, details, userId, submitted_by, status } = req.body;
-  
+    const { taskType, title, priority, amount, due_date, short_desc, details, userId, submitted_by, submitted_by_name, status } = req.body;
+
     if (!taskType || !title || !priority || !due_date || !short_desc || !details || !userId || !submitted_by || !status) {
       return res.status(400).json({ error: 'All fields are required' });
     }
-  
+
     const newTask = {
       taskType,
       title,
@@ -103,6 +103,7 @@ TaskNexApp.post('/insertEvent', async (req, res) => {
       details,
       userId,
       submitted_by,
+      submitted_by_name: submitted_by_name || '',
       status,
       submitted_at: new Date(),
       last_updated: new Date(),
@@ -121,12 +122,12 @@ TaskNexApp.post('/insertEvent', async (req, res) => {
   
 
   TaskNexApp.post('/expenseClaim', async (req, res) => {
-    const { taskType, title, priority, amount, due_date, short_desc, details, userId, submitted_by, status } = req.body;
-  
+    const { taskType, title, priority, amount, due_date, short_desc, details, userId, submitted_by, submitted_by_name, status } = req.body;
+
     if (!taskType || !title || !priority || !due_date || !short_desc || !details || !userId || !submitted_by || !status) {
       return res.status(400).json({ error: 'All fields are required' });
     }
-  
+
     const newTask = {
       taskType,
       title,
@@ -137,6 +138,7 @@ TaskNexApp.post('/insertEvent', async (req, res) => {
       details,
       userId,
       submitted_by,
+      submitted_by_name: submitted_by_name || '',
       status,
       submitted_at: new Date(),
       last_updated: new Date(),

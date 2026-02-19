@@ -39,14 +39,23 @@ const TaskPieChart = ({tasks }) => {
   };
 
   const options = {
+    maintainAspectRatio: false,
     plugins: {
+      legend: {
+        position: 'bottom',
+        labels: {
+          color: '#fff',
+          font: { size: 13, weight: '600' },
+          padding: 16,
+          usePointStyle: true,
+          pointStyleWidth: 10,
+        },
+      },
       tooltip: {
         callbacks: {
           label: function (context) {
             let label = context.label || '';
-            if (label) {
-              label += ': ';
-            }
+            if (label) label += ': ';
             label += context.raw;
             return label;
           },
@@ -54,20 +63,19 @@ const TaskPieChart = ({tasks }) => {
       },
       datalabels: {
         color: '#fff',
-        formatter: (value, context) => {
-          return value;
-        },
-        font: {
-          weight: 'bold',
-          size: 14,
-        },
+        formatter: (value) => (value > 0 ? value : ''),
+        font: { weight: 'bold', size: 14 },
         anchor: 'center',
         align: 'center',
       },
     },
   };
 
-  return <Pie data={data} options={options} width="240px" height="240px"/>;
+  return (
+    <div style={{ width: 260, height: 300 }}>
+      <Pie data={data} options={options} />
+    </div>
+  );
 };
 
 

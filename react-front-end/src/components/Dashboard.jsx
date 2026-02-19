@@ -6,6 +6,7 @@ import {
   CardContent,
   Typography,
   Box,
+  Chip,
 } from "@mui/material";
 import TaskCards from "./TaskCards";
 import Header from "./Header";
@@ -14,8 +15,14 @@ import TaskModule from "./TaskModule";
 import { useNavigate } from "react-router-dom";
 import TaskPieChart from "../helper/pieChart";
 
+const STATUS_CONFIG = {
+  Submitted:     { color: "#6366f1", bg: "#eef2ff" },
+  "In Progress": { color: "#f59e0b", bg: "#fffbeb" },
+  Approved:      { color: "#10b981", bg: "#ecfdf5" },
+  Rejected:      { color: "#ef4444", bg: "#fef2f2" },
+};
 
-const Dashboard = ({ }) => {
+const Dashboard = ({}) => {
   const [isTaskModuleOpen, setTaskModuleOpen] = useState(false);
   const [isTaskOpen, setIsTaskOpen] = useState(false);
   const [tasks, setTasks] = useState([]);
@@ -26,14 +33,8 @@ const Dashboard = ({ }) => {
   const [department, setDepartment] = useState(null);
   const navigate = useNavigate();
   const [pieChartData, setPieChartData] = useState([10, 3, 2, 5]);
-  // const apiBaseUrl = process.env.REACT_APP_API_BASE_URL;
-  // const apiPort = process.env.REACT_APP_API_PORT;
-  // const editEvent = `${apiBaseUrl}:${apiPort}/editEvent`;
-  // const editExpress = `${apiBaseUrl}:${apiPort}/expenseClaim`;
-  // const deleteEvent = `${apiBaseUrl}:${apiPort}/delEvent`;
-  // const delClaim = `${apiBaseUrl}:${apiPort}/delClaim`;
 
-
+  const apiBaseUrl = process.env.REACT_APP_API_BASE_URL;
 
   useEffect(() => {
     const role = localStorage.getItem("userRole");
@@ -54,19 +55,18 @@ const Dashboard = ({ }) => {
   useEffect(() => {
     const fetchTasks = async () => {
       try {
-        const allTasksResponse = await fetch('http://localhost:8888/tasks');
+        const allTasksResponse = await fetch(`${apiBaseUrl}/tasks`);
         const allTasksData = await allTasksResponse.json();
 
-        // Filter tasks based on user role and department
         let filteredTasks = allTasksData;
-        if (userRole === 'Admin') {
-          if (department === 'HR') {
-            filteredTasks = allTasksData.filter(task => task.taskType === 'Event Idea');
-          } else if (department === 'Account') {
-            filteredTasks = allTasksData.filter(task => task.taskType === 'Expense');
+        if (userRole === "Admin") {
+          if (department === "HR") {
+            filteredTasks = allTasksData.filter((task) => task.taskType === "Event Idea");
+          } else if (department === "Account") {
+            filteredTasks = allTasksData.filter((task) => task.taskType === "Expense");
           }
-        } else if (userRole === 'User') {
-          filteredTasks = allTasksData.filter(task => task.submitted_by === userId);
+        } else if (userRole === "User") {
+          filteredTasks = allTasksData.filter((task) => task.submitted_by === userId);
         }
 
         setTasks(filteredTasks);
@@ -78,27 +78,18 @@ const Dashboard = ({ }) => {
     if (userId) {
       fetchTasks();
     }
-  }, [userId, userRole, department]);
+  }, [userId, userRole, department, apiBaseUrl]);
 
   const statuses = ["Submitted", "In Progress", "Approved", "Rejected"];
 
   const handleOpenTask = (task) => {
-    console.log("Task opened:", task);
     setTask(task);
     setIsTaskOpen(true);
   };
 
-  const handleCloseTask = () => {
-    setIsTaskOpen(false);
-  };
-
-  const handleOpenNewTask = () => {
-    setTaskModuleOpen(true);
-  };
-
-  const handleCloseNewTask = () => {
-    setTaskModuleOpen(false);
-  };
+  const handleCloseTask = () => setIsTaskOpen(false);
+  const handleOpenNewTask = () => setTaskModuleOpen(true);
+  const handleCloseNewTask = () => setTaskModuleOpen(false);
 
   const handleLogout = () => {
     localStorage.clear();
@@ -107,71 +98,55 @@ const Dashboard = ({ }) => {
 
   const updateTaskStatus = async (taskId, newStatus) => {
     try {
-      const response = await fetch(`http://localhost:8888/updateTaskStatus/${taskId}`, {
+      const response = await fetch(`${apiBaseUrl}/updateTaskStatus/${taskId}`, {
         method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status: newStatus }),
       });
 
       if (response.ok) {
-        const data = await response.json();
         setTasks((prevTasks) =>
           prevTasks.map((task) =>
             task._id === taskId ? { ...task, status: newStatus } : task
           )
         );
-        console.log("Task status updated:", data);
       } else {
         const errorText = await response.text();
-        console.error("Failed to update task status:", errorText);
         alert(`Failed to update task status: ${errorText}`);
       }
       handleCloseTask();
     } catch (error) {
-      console.error("Failed to update task status:", error);
       alert(`Failed to update task status: ${error.message}`);
     }
   };
 
   const deleteTask = async (taskId) => {
-    console.log("Deleting task:", taskId);
     try {
-      const response = await fetch(`http://localhost:8888/delEvent/${taskId}`, {
+      const response = await fetch(`${apiBaseUrl}/delEvent/${taskId}`, {
         method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
       });
 
       if (response.ok) {
         const data = await response.json();
-        console.log("Task deleted:", data);
         if (data.deletedCount > 0) {
           setTasks((prevTasks) => prevTasks.filter((task) => task._id !== taskId));
-        } else {
-          console.warn("No tasks deleted, check if taskId is correct");
         }
       } else {
         const errorText = await response.text();
-        console.error("Failed to delete task:", errorText);
         alert(`Failed to delete task: ${errorText}`);
       }
       handleCloseTask();
     } catch (error) {
-      console.error("Failed to delete task:", error);
       alert(`Failed to delete task: ${error.message}`);
     }
   };
 
-
-  // Calculate the number of approved tasks and the total number of tasks
   const totalTasks = tasks.length;
-  const approvedTasks = tasks.filter(task => task.status === 'Approved').length;
+  const approvedTasks = tasks.filter((task) => task.status === "Approved").length;
 
   return (
-    <Container maxWidth={false} sx={{ px: 5 }}>
+    <Box sx={{ minHeight: "100vh", backgroundColor: "#f8fafc" }}>
       <Header
         userFname={userFname}
         userRole={userRole}
@@ -179,76 +154,149 @@ const Dashboard = ({ }) => {
         onLogout={handleLogout}
       />
 
-{userRole === 'Admin' && (
-        <Box sx={{ display: "flex", justifyContent: "space-between", fontFamily: 'Poppins, sans-serif' , mb: 4 , mt: 5 }}>
-          <Box sx={{ marginLeft: 10 }}>
-            <Typography variant="h5">Total Progress</Typography>
-            <Typography variant="h3">{((approvedTasks / totalTasks) * 100).toFixed(0)}%</Typography>
-            <Typography variant="h6">Tasks completed: {approvedTasks}</Typography>
-            <Typography variant="h6">Total tasks: {totalTasks}</Typography>
-          </Box>
-          <Box sx={{ marginRight: 30 }}>
-            <TaskPieChart tasks={tasks} />
-          </Box>
-        </Box>
-      )}
+      <Container maxWidth={false} sx={{ px: { xs: 2, md: 5 }, pt: 4, pb: 6 }}>
 
-
-
-      <Grid container spacing={3}>
-        {statuses.map((status) => (
-          <Grid item xs={12} sm={6} md={6} lg={3} key={status}>
-            <Box
-              sx={{ border: "1px solid #ccc", borderRadius: 2, p: 2, mb: 3 }}
-            >
-              <Typography
-                variant="h6"
-                gutterBottom
-                sx={{ mb: 2, fontFamily: 'Poppins, sans-serif' }}
-              >
-                {status}
+        {/* Admin stats banner */}
+        {userRole === "Admin" && (
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: { xs: "column", md: "row" },
+              alignItems: "center",
+              gap: 3,
+              mb: 5,
+              p: 4,
+              borderRadius: 3,
+              background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+              color: "#fff",
+              boxShadow: "0 10px 40px rgba(102,126,234,0.3)",
+            }}
+          >
+            <Box sx={{ flex: 1 }}>
+              <Typography variant="overline" sx={{ opacity: 0.8, letterSpacing: 2 }}>
+                Total Progress
               </Typography>
-              <Grid container spacing={3}>
-                {tasks
-                  .filter((task) => task.status === status)
-                  .map((task, index) => (
-                    <Grid item xs={12} key={index}>
-                      <Card onClick={() => handleOpenTask(task)} variant="outlined"
-                        sx={{
-                          mb: 2,
-                          transition: "box-shadow 0.3s ease-in-out",
-                          "&:hover": {
-                            boxShadow: 6, // You can adjust the value for a stronger or softer shadow
-                          },
-                        }} >
-                        <CardContent>
-                          <TaskCards
-                            title={task.title}
-                            description={task.short_desc}
-                            dueDate={task.due_date || task.dueDate}
-                            priority={task.priority}
-                            taskType={task.taskType}
-                            userRole={userRole}
-                            onInProgress={() => updateTaskStatus(task._id, 'In Progress')}
-                            onApprove={() => updateTaskStatus(task._id, 'Approved')}
-                            onReject={() => updateTaskStatus(task._id, 'Rejected')}
-                            onDelete={() => deleteTask(task._id)}
-                          />
-                        </CardContent>
-                      </Card>
-                    </Grid>
-                  ))}
-              </Grid>
+              <Typography variant="h2" fontWeight={700} fontFamily="Poppins, sans-serif">
+                {totalTasks > 0 ? ((approvedTasks / totalTasks) * 100).toFixed(0) : 0}%
+              </Typography>
+              <Typography variant="body1" sx={{ opacity: 0.9, mt: 1 }}>
+                {approvedTasks} of {totalTasks} tasks completed
+              </Typography>
             </Box>
-          </Grid>
-        ))}
-      </Grid>
+            <Box>
+              <TaskPieChart tasks={tasks} />
+            </Box>
+          </Box>
+        )}
+
+        {/* Kanban board */}
+        <Grid container spacing={3}>
+          {statuses.map((status) => {
+            const config = STATUS_CONFIG[status];
+            const columnTasks = tasks.filter((t) => t.status === status);
+            return (
+              <Grid item xs={12} sm={6} lg={3} key={status}>
+                <Box
+                  sx={{
+                    borderRadius: 3,
+                    backgroundColor: "#fff",
+                    boxShadow: "0 1px 3px rgba(0,0,0,0.08)",
+                    overflow: "hidden",
+                    height: "100%",
+                  }}
+                >
+                  {/* Column header */}
+                  <Box
+                    sx={{
+                      px: 2.5,
+                      py: 2,
+                      borderBottom: `3px solid ${config.color}`,
+                      backgroundColor: config.bg,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                    }}
+                  >
+                    <Typography
+                      variant="subtitle1"
+                      fontWeight={700}
+                      fontFamily="Poppins, sans-serif"
+                      sx={{ color: config.color }}
+                    >
+                      {status}
+                    </Typography>
+                    <Chip
+                      label={columnTasks.length}
+                      size="small"
+                      sx={{
+                        backgroundColor: config.color,
+                        color: "#fff",
+                        fontWeight: 700,
+                        fontSize: "0.75rem",
+                        height: 22,
+                      }}
+                    />
+                  </Box>
+
+                  {/* Task cards */}
+                  <Box sx={{ p: 2, display: "flex", flexDirection: "column", gap: 1.5 }}>
+                    {columnTasks.length === 0 ? (
+                      <Typography
+                        variant="body2"
+                        color="text.disabled"
+                        textAlign="center"
+                        sx={{ py: 4 }}
+                      >
+                        No tasks
+                      </Typography>
+                    ) : (
+                      columnTasks.map((task, index) => (
+                        <Card
+                          key={index}
+                          onClick={() => handleOpenTask(task)}
+                          variant="outlined"
+                          sx={{
+                            cursor: "pointer",
+                            borderRadius: 2,
+                            border: "1px solid #e2e8f0",
+                            transition: "all 0.2s ease",
+                            "&:hover": {
+                              boxShadow: "0 4px 16px rgba(0,0,0,0.1)",
+                              transform: "translateY(-2px)",
+                              borderColor: config.color,
+                            },
+                          }}
+                        >
+                          <CardContent sx={{ p: 2, "&:last-child": { pb: 2 } }}>
+                            <TaskCards
+                              title={task.title}
+                              description={task.short_desc}
+                              dueDate={task.due_date || task.dueDate}
+                              priority={task.priority}
+                              taskType={task.taskType}
+                              userRole={userRole}
+                              submittedByName={task.submitted_by_name}
+                              onInProgress={() => updateTaskStatus(task._id, "In Progress")}
+                              onApprove={() => updateTaskStatus(task._id, "Approved")}
+                              onReject={() => updateTaskStatus(task._id, "Rejected")}
+                              onDelete={() => deleteTask(task._id)}
+                            />
+                          </CardContent>
+                        </Card>
+                      ))
+                    )}
+                  </Box>
+                </Box>
+              </Grid>
+            );
+          })}
+        </Grid>
+      </Container>
 
       <NewTaskModule
         task={{}}
         open={isTaskModuleOpen}
         onClose={handleCloseNewTask}
-
         id={userId}
       />
       <TaskModule
@@ -256,12 +304,12 @@ const Dashboard = ({ }) => {
         open={isTaskOpen}
         onClose={handleCloseTask}
         userRole={userRole}
-        onInProgress={() => updateTaskStatus(task._id, 'In Progress')}
-        onApprove={() => updateTaskStatus(task._id, 'Approved')}
-        onReject={() => updateTaskStatus(task._id, 'Rejected')}
+        onInProgress={() => updateTaskStatus(task._id, "In Progress")}
+        onApprove={() => updateTaskStatus(task._id, "Approved")}
+        onReject={() => updateTaskStatus(task._id, "Rejected")}
         onDelete={() => deleteTask(task._id)}
       />
-    </Container>
+    </Box>
   );
 };
 

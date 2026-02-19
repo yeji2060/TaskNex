@@ -4,9 +4,9 @@ import { useHistory } from 'react-router-dom';
 import {Modal} from 'react-responsive-modal';
 import { v4 as uuidv4 } from 'uuid';
 
-const loginUrl = "https://tasknexauth.onrender.com/api/auth/login";
-const getUserData = "https://tasknexauth.onrender.com/api/auth/userinfo";
-const postAdminUsers = "https://tasknexauth.onrender.com/api/auth/register";
+const loginUrl = `${process.env.REACT_APP_AUTH_BASE_URL}/api/auth/login`;
+const getUserData = `${process.env.REACT_APP_AUTH_BASE_URL}/api/auth/userinfo`;
+const postAdminUsers = `${process.env.REACT_APP_AUTH_BASE_URL}/api/auth/register`;
 
 const Adlogin = () => {
     const [password, setPassword] = useState('');

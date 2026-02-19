@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import {
   Dialog,
-  DialogTitle,
   DialogContent,
   TextField,
   Grid,
@@ -9,32 +8,41 @@ import {
   Button,
   IconButton,
   Box,
+  Typography,
+  Divider,
 } from "@mui/material";
+import { Close as CloseIcon, AddTaskOutlined } from "@mui/icons-material";
 import { useTheme } from "@mui/material/styles";
-import { Close as CloseIcon } from "@mui/icons-material";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import "./../TaskModule.css";
+import dayjs from "dayjs";
 import validateFieldHelper from "./../helper/validateField";
 
 const NewTaskModule = ({ open, onClose, id }) => {
   const userid = id || 1002;
+  const userFname = localStorage.getItem("userFname") || "";
+  const userLname = localStorage.getItem("userLname") || "";
+  const submittedByName = userLname
+    ? `${userFname} ${userLname.charAt(0).toUpperCase()}.`
+    : userFname;
+
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+
   const [taskType, setTaskType] = useState("");
   const [title, setTitle] = useState("");
   const [priority, setPriority] = useState("");
   const [amount, setAmount] = useState("");
-  const [dueDate, setDueDate] = useState(new Date());
+  const [dueDate, setDueDate] = useState(dayjs());
   const [shortDesc, setshortDesc] = useState("");
   const [details, setDetails] = useState("");
+
   const apiBaseUrl = process.env.REACT_APP_API_BASE_URL;
-  const apiPort = process.env.REACT_APP_API_PORT;
-  const newEventTask = `${apiBaseUrl}:${apiPort}/insertEvent`;
-  const newExpenseTask = `${apiBaseUrl}:${apiPort}/expenseClaim`;
-  // Error state for each field
+  const newEventTask = `${apiBaseUrl}/insertEvent`;
+  const newExpenseTask = `${apiBaseUrl}/expenseClaim`;
+
   const [taskTypeError, setTaskTypeError] = useState(false);
   const [titleError, setTitleError] = useState(false);
   const [priorityError, setPriorityError] = useState(false);
@@ -43,7 +51,6 @@ const NewTaskModule = ({ open, onClose, id }) => {
     setTaskTypeError(false);
     setTitleError(false);
     setPriorityError(false);
-    // Add other error states if needed
   };
 
   const resetAllFields = () => {
@@ -51,54 +58,46 @@ const NewTaskModule = ({ open, onClose, id }) => {
     setTitle("");
     setPriority("");
     setAmount("");
-    setDueDate(new Date());
+    setDueDate(dayjs());
     setshortDesc("");
     setDetails("");
-    // Add other fields if needed
   };
 
   const handleCancel = () => {
-    // Reset all fields
     resetAllFields();
-    // Reset error states
     resetErrorStates();
     onClose();
   };
 
   const handleSave = async () => {
-
     const isTaskTypeValid = validateFieldHelper(taskType, setTaskTypeError);
     const isTitleValid = validateFieldHelper(title, setTitleError);
     const isPriorityValid = validateFieldHelper(priority, setPriorityError);
 
-      // Proceed only if all validations pass
-  if (!isTaskTypeValid || !isTitleValid || !isPriorityValid) {
-    return;
-  }
+    if (!isTaskTypeValid || !isTitleValid || !isPriorityValid) return;
 
     const newTask = {
-      taskType: taskType,
-      title: title,
-      priority: priority,
-      amount: amount,
+      taskType,
+      title,
+      priority,
+      amount,
       due_date: dueDate,
       short_desc: shortDesc,
-      details: details,
+      details,
       userId: userid,
       submitted_by: userid,
+      submitted_by_name: submittedByName,
       status: "Submitted",
-     
     };
 
-    let apiEndpoint; // Variable to hold the API endpoint
+    const apiEndpoint =
+      newTask.taskType === "Event Idea"
+        ? newEventTask
+        : newTask.taskType === "Expense"
+        ? newExpenseTask
+        : null;
 
-  
-    // Determine the API endpoint based on task type
-    if (newTask.taskType === "Event Idea") {
-      apiEndpoint = newEventTask;
-    } else if (newTask.taskType === "Expense") {
-      apiEndpoint = newExpenseTask;
-    } else {
+    if (!apiEndpoint) {
       console.error("Invalid task type");
       return;
     }
@@ -106,9 +105,7 @@ const NewTaskModule = ({ open, onClose, id }) => {
     try {
       const response = await fetch(apiEndpoint, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(newTask),
       });
 
@@ -124,157 +121,195 @@ const NewTaskModule = ({ open, onClose, id }) => {
   };
 
   return (
-    <Dialog open={open} onClose={handleCancel} maxWidth="md" fullWidth>
-      <DialogTitle>
-        Make a new Task{" "}
-        <IconButton
-          aria-label="close"
-          onClick={onClose}
+    <Dialog
+      open={open}
+      onClose={handleCancel}
+      maxWidth="sm"
+      fullWidth
+      PaperProps={{
+        sx: {
+          borderRadius: 3,
+          boxShadow: "0 20px 60px rgba(0,0,0,0.15)",
+        },
+      }}
+    >
+      {/* Header */}
+      <Box
+        sx={{
+          px: 3,
+          pt: 3,
+          pb: 2,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+        }}
+      >
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+          <Box
+            sx={{
+              width: 38,
+              height: 38,
+              borderRadius: 2,
+              background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <AddTaskOutlined sx={{ color: "#fff", fontSize: 20 }} />
+          </Box>
+          <Box>
+            <Typography
+              variant="h6"
+              fontWeight={700}
+              fontFamily="Poppins, sans-serif"
+              lineHeight={1.2}
+            >
+              New Task
+            </Typography>
+            <Typography variant="caption" color="text.secondary">
+              Fill in the details below
+            </Typography>
+          </Box>
+        </Box>
+        <IconButton onClick={handleCancel} size="small" sx={{ color: "text.secondary" }}>
+          <CloseIcon fontSize="small" />
+        </IconButton>
+      </Box>
+
+      <Divider />
+
+      <DialogContent sx={{ px: 3, py: 2.5 }}>
+        <Grid container spacing={2}>
+
+          {/* Task Type */}
+          <Grid item xs={12}>
+            <TextField
+              fullWidth
+              label="Task Type"
+              select
+              value={taskType}
+              onChange={(e) => setTaskType(e.target.value)}
+              error={taskTypeError}
+              helperText={taskTypeError ? "Task type is required" : ""}
+              size="small"
+            >
+              <MenuItem value="Event Idea">Event Idea</MenuItem>
+              <MenuItem value="Expense">Expense</MenuItem>
+            </TextField>
+          </Grid>
+
+          {/* Title + Priority */}
+          <Grid item xs={12} sm={8}>
+            <TextField
+              fullWidth
+              label="Title"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              error={titleError}
+              helperText={titleError ? "Title is required" : ""}
+              size="small"
+            />
+          </Grid>
+          <Grid item xs={12} sm={4}>
+            <TextField
+              fullWidth
+              label="Priority"
+              select
+              value={priority}
+              onChange={(e) => setPriority(e.target.value)}
+              error={priorityError}
+              helperText={priorityError ? "Required" : ""}
+              size="small"
+            >
+              <MenuItem value="Low">Low</MenuItem>
+              <MenuItem value="Medium">Medium</MenuItem>
+              <MenuItem value="High">High</MenuItem>
+            </TextField>
+          </Grid>
+
+          {/* Amount + Due Date */}
+          <Grid item xs={12} sm={6}>
+            <TextField
+              fullWidth
+              label="Amount ($)"
+              type="number"
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+              size="small"
+            />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <DatePicker
+                label="Due Date"
+                value={dueDate}
+                onChange={(date) => setDueDate(date)}
+                slotProps={{ textField: { fullWidth: true, size: "small" } }}
+              />
+            </LocalizationProvider>
+          </Grid>
+
+          {/* Short Description */}
+          <Grid item xs={12}>
+            <TextField
+              fullWidth
+              label="Short Description"
+              value={shortDesc}
+              onChange={(e) => setshortDesc(e.target.value)}
+              size="small"
+            />
+          </Grid>
+
+          {/* Details */}
+          <Grid item xs={12}>
+            <TextField
+              fullWidth
+              label="Details"
+              value={details}
+              onChange={(e) => setDetails(e.target.value)}
+              multiline
+              rows={3}
+              size="small"
+            />
+          </Grid>
+        </Grid>
+      </DialogContent>
+
+      <Divider />
+
+      {/* Footer buttons */}
+      <Box sx={{ px: 3, py: 2, display: "flex", gap: 1.5, justifyContent: "flex-end" }}>
+        <Button
+          variant="outlined"
+          onClick={handleCancel}
           sx={{
-            position: "absolute",
-            right: 8,
-            top: 8,
+            borderColor: "#e2e8f0",
+            color: "#6b7280",
+            borderRadius: 2,
+            textTransform: "none",
+            fontWeight: 600,
+            "&:hover": { borderColor: "#cbd5e1", backgroundColor: "#f8fafc" },
           }}
         >
-          <CloseIcon />
-        </IconButton>
-      </DialogTitle>
-      <DialogContent>
-        <Box p={isMobile ? 1 : 2} m={isMobile ? 1 : 2}>
-          <Grid container spacing={isMobile ? 2 : 3}>
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                label="taskType"
-                name="taskType"
-                select
-                variant="outlined"
-                className="lightGreyDefaultValue"
-                value={taskType}
-                onChange={(event) => setTaskType(event.target.value)}
-                error={taskTypeError}
-                helperText={taskTypeError ? "Task Type is required" : ""}
-              >
-                <MenuItem value="Event Idea">Event Idea</MenuItem>
-                <MenuItem value="Expense">Expense</MenuItem>
-              </TextField>
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                label="Title"
-                name="title"
-                value={title}
-                variant="outlined"
-                className="lightGreyDefaultValue"
-                onChange={(event) => setTitle(event.target.value)}
-                error={titleError}
-                helperText={titleError ? "Title is required" : ""}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                label="Priority"
-                name="priority"
-                value={priority}
-                select
-                variant="outlined"
-                className="lightGreyDefaultValue"
-                onChange={(event) => setPriority(event.target.value)}
-                error={priorityError}
-                helperText={priorityError ? "Priority is required" : ""}
-              >
-                <MenuItem value="Low">Low</MenuItem>
-                <MenuItem value="Medium">Medium</MenuItem>
-                <MenuItem value="High">High</MenuItem>
-              </TextField>
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                label="Amount"
-                name="amount"
-                value={amount}
-                variant="outlined"
-                type="number"
-                className="lightGreyDefaultValue"
-                onChange={(event) => setAmount(event.target.value)}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <DatePicker
-                  className="datepicker"
-                  label="Due Date"
-                  name="due_date"
-                  selected={dueDate}
-                  onChange={(date) => setDueDate(date)}
-                  slotProps={{
-                    textField: {
-                      fullWidth: true,
-                      className: "lightGreyDefaultValue",
-                    },
-                  }}
-                  // )}
-                />
-              </LocalizationProvider>
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                label="Short Description"
-                name="short_desc"
-                value={shortDesc}
-                variant="outlined"
-                className="lightGreyDefaultValue"
-                onChange={(event) => setshortDesc(event.target.value)}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                label="Details"
-                name="details"
-                value={details}
-                variant="outlined"
-                multiline
-                rows={4}
-                className="lightGreyDefaultValue"
-                onChange={(event) => setDetails(event.target.value)}
-              />
-            </Grid>
-            <Grid
-              item
-              xs={12}
-              container
-              spacing={2}
-              justifyContent="space-between"
-            >
-              <Grid item xs={6}>
-                <Button
-                  fullWidth
-                  variant="outlined"
-                  color="primary"
-                  onClick={handleCancel}
-                >
-                  Cancel
-                </Button>
-              </Grid>
-              <Grid item xs={6}>
-                <Button
-                  fullWidth
-                  variant="contained"
-                  color="primary"
-                  onClick={handleSave}
-                >
-                  Save
-                </Button>
-              </Grid>
-            </Grid>
-          </Grid>
-        </Box>
-      </DialogContent>
+          Cancel
+        </Button>
+        <Button
+          variant="contained"
+          onClick={handleSave}
+          sx={{
+            background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+            color: "#fff",
+            borderRadius: 2,
+            textTransform: "none",
+            fontWeight: 600,
+            boxShadow: "none",
+            "&:hover": { boxShadow: "0 4px 12px rgba(102,126,234,0.4)" },
+          }}
+        >
+          Create Task
+        </Button>
+      </Box>
     </Dialog>
   );
 };
