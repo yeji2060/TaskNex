@@ -36,53 +36,39 @@ TaskNexApp.get('/tasks', async (req, res) => {
     }
   });
 
-TaskNexApp.get('/getEventIdeas', (req,res)=> {
+TaskNexApp.get('/getEventIdeas', async (req,res)=> {
     let query = {};
-    console.log(req.query.id)
     if(req.query.id){
         query={_id:(req.query.id)}
+    } else if(req.query.user){
+        query={userId:(req.query.user)}
+    } else if (req.query.userDept){
+        query={'department':(req.query.userDept)}
     }
-//return EventIdeas wrt userId
-    else if(req.query.user){
-        let user = (req.query.user)
-        query={userId:(user)}
-    }
-
-//return EventIdeas wrt department
-    else if (req.query.userDept){
-        let userDept=(req.query.userDept)
-        query={'department':(userDept)}
-    }
-
-    db.collection('eventsideas').find(query).toArray((err,result) => {
-        if(err) throw err;
+    try {
+        const result = await db.collection('eventsideas').find(query).toArray();
         res.send(result)
-    })
+    } catch(err) {
+        res.status(500).send({error: err.message})
+    }
 })
 
 //return all Claims
-TaskNexApp.get('/getClaims', (req,res)=> {
+TaskNexApp.get('/getClaims', async (req,res)=> {
     let query = {};
-    console.log(req.query.id)
     if(req.query.id){
         query={_id:(req.query.id)}
+    } else if(req.query.userClaims){
+        query={userId:(req.query.userClaims)}
+    } else if (req.query.claimsByDept){
+        query={'department':(req.query.claimsByDept)}
     }
-//return Claims wrt userId
-    else if(req.query.userClaims){
-        let  userClaims = (req.query.userClaims)
-        query={userId:(userClaims)}
-    }
-
-//return Claims wrt department
-    else if (req.query.claimsByDept){
-        let claimsByDept=(req.query.claimsByDept)
-        query={'department':(claimsByDept)}
-    }
-
-    db.collection('claims').find(query).toArray((err,result) => {
-        if(err) throw err;
+    try {
+        const result = await db.collection('claims').find(query).toArray();
         res.send(result)
-    })
+    } catch(err) {
+        res.status(500).send({error: err.message})
+    }
 })
 
 
@@ -171,7 +157,7 @@ TaskNexApp.post('/insertEvent', async (req, res) => {
           }
       
           const result = await db.collection('tasks').updateOne(
-            { _id: ObjectId(id) },
+            { _id: new ObjectId(id) },
             { $set: { status: status, last_updated: new Date() } }
           );
       
@@ -210,7 +196,7 @@ TaskNexApp.post('/insertEvent', async (req, res) => {
           };
       
           const result = await db.collection('tasks').updateOne(
-            { _id: ObjectId(id) },
+            { _id: new ObjectId(id) },
             { $set: updateFields }
           );
       
@@ -238,7 +224,7 @@ TaskNexApp.delete('/delEvent/:id', async (req, res) => {
         return res.status(400).json({ error: 'Invalid task ID' });
       }
   
-      const result = await db.collection('tasks').deleteOne({ _id: ObjectId(id) });
+      const result = await db.collection('tasks').deleteOne({ _id: new ObjectId(id) });
       console.log('Delete result:', result);
   
       if (result.deletedCount === 0) {
@@ -255,59 +241,55 @@ TaskNexApp.delete('/delEvent/:id', async (req, res) => {
   
 // View history of status changes
 
-TaskNexApp.get('/getEventsStatusLog', (req,res)=> {
+TaskNexApp.get('/getEventsStatusLog', async (req,res)=> {
     let query = {};
-    console.log(req.query.id)
     if(req.query.id){
         query={_id:(req.query.id)}
+    } else if(req.query.eventsRequests){
+        query={title:(req.query.eventsRequests)}
     }
-//return events status log wrt title
-    else if(req.query.eventsRequests){
-        let eventsRequests = (req.query.eventsRequests)
-        query={title:(eventsRequests)}
-    }
-
-    db.collection('eventslogs').find(query).toArray((err,result) => {
-        if(err) throw err;
+    try {
+        const result = await db.collection('eventslogs').find(query).toArray();
         res.send(result)
-    })
+    } catch(err) {
+        res.status(500).send({error: err.message})
+    }
 })
 
-TaskNexApp.get('/getClaimsStatusLog', (req,res)=> {
+TaskNexApp.get('/getClaimsStatusLog', async (req,res)=> {
     let query = {};
-    console.log(req.query.id)
     if(req.query.id){
         query={_id:(req.query.id)}
+    } else if(req.query.ClaimRequest){
+        query={title:(req.query.ClaimRequest)}
     }
-//return events status log wrt title
-    else if(req.query.ClaimRequest){
-        let ClaimRequest = (req.query.ClaimRequest)
-        query={title:(ClaimRequest)}
-    }
-
-    db.collection('claimslogs').find(query).toArray((err,result) => {
-        if(err) throw err;
+    try {
+        const result = await db.collection('claimslogs').find(query).toArray();
         res.send(result)
-    })
+    } catch(err) {
+        res.status(500).send({error: err.message})
+    }
 })
 
 
 // Update events status log
-TaskNexApp.post('/EventsStatusLogPost',(req,res)=>{
-	console.log(req.body);
-	db.collection('eventslogs').insertOne(req.body,(err,result)=>{
-		if(err) throw err;
-		res.send({message: 'A new log was added'}, result);
-	})
+TaskNexApp.post('/EventsStatusLogPost', async (req,res)=>{
+    try {
+        const result = await db.collection('eventslogs').insertOne(req.body);
+        res.send({message: 'A new log was added', result});
+    } catch(err) {
+        res.status(500).send({error: err.message})
+    }
 })
 
 // Update claims status log
-TaskNexApp.post('/ClaimsStatusLogPost',(req,res)=>{
-	console.log(req.body);
-	db.collection('claimslogs').insertOne(req.body,(err,result)=>{
-		if(err) throw err;
-		res.send({message: 'A new log was added'}, result);
-	})
+TaskNexApp.post('/ClaimsStatusLogPost', async (req,res)=>{
+    try {
+        const result = await db.collection('claimslogs').insertOne(req.body);
+        res.send({message: 'A new log was added', result});
+    } catch(err) {
+        res.status(500).send({error: err.message})
+    }
 })
 
 // Aggregation query to get a single user's data with events and claims
