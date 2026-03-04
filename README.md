@@ -1,142 +1,230 @@
 # TaskNex
 
+A full-stack task management web application for teams — submit event ideas and expense claims, track approval status, and manage workflows by department.
 
-## Overview
+**🚀 Live Demo:** https://task-nex.vercel.app
 
-TaskNex is a comprehensive web application designed to allow users to submit and manage tasks all in one place. Inspired by the challenges faced by companies with administrators operating across different time zones, TaskNex streamlines task management through a clear dashboard, preventing tasks from being overlooked and enhancing efficiency.
+---
+
+## Screenshots
+
+### Login & Register
+<p float="left">
+  <img src="./screenshots/login.png" width="48%" />
+  <img src="./screenshots/register.png" width="48%" />
+</p>
+
+### Dashboard — User View
+![Dashboard User](./screenshots/dashboard-user.png)
+
+### Dashboard — Admin View (with Stats & Pie Chart)
+![Dashboard Admin](./screenshots/dashboard-admin.png)
+
+### New Task Modal
+![New Task](./screenshots/new-task.png)
+
+### Task Detail Modal
+![Task Detail](./screenshots/task-detail.png)
+
+> **Adding screenshots:** Take screenshots of each page and save them to the `screenshots/` folder with the filenames above.
+
+---
 
 ## Features
 
-- **Centralized Task Management**: Submit, track, and manage tasks from a single dashboard.
-- **User Roles & Permissions**: Differentiate access and control based on user roles.
-- **Real-time Updates**: Immediate reflection of task changes and updates.
-- **Visual Analytics**: Utilize charts and graphs to monitor task statuses and progress.
-- **Server Monitoring**: Ensure server reliability with PM2, automatically restarting in case of crashes.
+- **JWT Authentication** — Secure register and login with encrypted passwords (bcryptjs)
+- **Role-based Access** — Admin and User roles with separate views and permissions
+- **Kanban Dashboard** — Tasks organized into 4 columns: Submitted / In Progress / Approved / Rejected
+- **Task Types** — Event Ideas and Expense Claims
+- **Admin Controls** — Approve, Reject, or mark tasks In Progress directly from the task popup
+- **Submitter Visibility** — Admins see who created each task (`First L.` format)
+- **Pie Chart Stats** — Admin-only stats banner showing task status distribution
+- **Form Validation** — Email format, Canadian phone `(###)-###-####`, password match check
 
+---
 
-## Technologies Used
+## Tech Stack
 
+| Layer | Technology |
+|-------|------------|
+| Frontend | React 18, Material UI (MUI v5), Chart.js, MUI X DatePicker |
+| Auth Server | Node.js, Express, JWT, bcryptjs, Mongoose |
+| API Server | Node.js, Express, MongoDB Native Driver v6 |
+| Database | MongoDB Atlas |
+| Frontend Hosting | Vercel |
+| Backend Hosting | Render |
 
-- Front End: React, Material-UI, react-chartjs-2
-- Back End: Node.js, Express.js
-- Database: MongoDB
-- Process Management: PM2
+---
 
+## Project Structure
 
-## Installation
+```
+TaskNex/
+├── react-front-end/               # React frontend → Vercel
+│   └── src/
+│       ├── components/
+│       │   ├── Dashboard.jsx      # Kanban board with status columns
+│       │   ├── Header.jsx         # App header with role badge & logout
+│       │   ├── TaskCards.jsx      # Individual task card component
+│       │   ├── TaskModule.jsx     # Task detail & edit popup
+│       │   └── NewTaskModule.jsx  # Create new task popup
+│       ├── helper/
+│       │   └── pieChart.jsx       # Chart.js pie chart (admin only)
+│       ├── login.jsx
+│       └── register.jsx
+│
+└── Backend/
+    ├── AuthServerPlusSchema/      # Auth server → Render (port 5050)
+    │   ├── auth/
+    │   │   ├── authController.js  # /register, /login, /userinfo
+    │   │   └── userModal.js       # Mongoose User schema
+    │   ├── app.js
+    │   ├── db.js                  # Mongoose connection
+    │   └── config.js              # JWT secret config
+    │
+    └── TaskNex_Server/            # Main API server → Render (port 8888)
+        └── tasknexServer.js       # All task CRUD & status endpoints
+```
 
-1. Clone the Repository
+---
 
-```sh
+## Local Development
+
+### Prerequisites
+- Node.js 18+
+- MongoDB Atlas cluster (or local MongoDB)
+
+### 1. Clone the repo
+```bash
 git clone https://github.com/yeji2060/TaskNex.git
 cd TaskNex
 ```
 
-
-2. Set Up the Backend
-
-- Navigate to the backend directory:
-
-```sh
-cd Backend
-```
-- Install dependencies and start the server:
-```sh
+### 2. Auth Server — terminal 1
+```bash
+cd Backend/AuthServerPlusSchema
 npm install
+```
+Create `Backend/AuthServerPlusSchema/.env`:
+```
+PORT=5050
+MONGO_URI=mongodb+srv://<user>:<password>@cluster.mongodb.net/tasknexdb
+JWT_SECRET=your_secret_key
+```
+```bash
 npm start
+# → listening on port 5050
 ```
 
-
-3. Set Up the Frontend 
-
-- Open a new terminal window, navigate to the frontend directory: 
-
-```sh
-cd TaskNex_server
-```
-
-- Install dependencies and start the frontend server:
-```sh
+### 3. Main API Server — terminal 2
+```bash
+cd Backend/TaskNex_Server
 npm install
+```
+Create `Backend/TaskNex_Server/.env`:
+```
+PORT=8888
+MongoOnline=mongodb+srv://<user>:<password>@cluster.mongodb.net/
+```
+```bash
 npm start
+# → listening on port 8888
 ```
 
+### 4. Frontend — terminal 3
+```bash
+cd react-front-end
+npm install
+```
+Create `react-front-end/.env`:
+```
+REACT_APP_API_BASE_URL=http://localhost:8888
+REACT_APP_AUTH_BASE_URL=http://localhost:5050
+```
+```bash
+npm start
+# → http://localhost:3000
+```
 
+---
 
-## Usage
+## Deployment
 
+### Backend (Render.com)
 
-- **User Registration and Login**: Create an account or log in to start managing tasks. 
+Deploy each backend as a separate **Web Service**:
 
-During registration, users can select their department (e.g., HR, Accounts, etc.) and specify their role as either an admin or a user.
+| Setting | Auth Server | Main API Server |
+|---------|-------------|-----------------|
+| Root Directory | `Backend/AuthServerPlusSchema` | `Backend/TaskNex_Server` |
+| Build Command | `npm install` | `npm install` |
+| Start Command | `npm start` | `npm start` |
 
-Admins have advanced privileges for managing and overseeing tasks, while users can create and track their own tasks.
+**Environment Variables:**
 
+Auth Server:
+```
+MONGO_URI=<atlas_connection_string>/tasknexdb
+JWT_SECRET=<your_secret>
+```
 
+Main API Server:
+```
+MongoOnline=<atlas_connection_string>
+NODE_VERSION=18
+```
 
-<br><br>
-![register](./screenshots/register.png)
-<br><br>
+> **Important:** In MongoDB Atlas → **Network Access**, add `0.0.0.0/0` to allow connections from Render's dynamic IPs.
 
-Once registered, users can log in to access their personalized dashboard and start managing tasks efficiently.
+### Frontend (Vercel)
 
-![login](./screenshots/login.png)
+Import the GitHub repo and set:
 
+| Setting | Value |
+|---------|-------|
+| Root Directory | `react-front-end` |
+| Framework | Create React App |
 
-**< User side >**
+**Environment Variables:**
+```
+REACT_APP_API_BASE_URL=https://<your-main-api>.onrender.com
+REACT_APP_AUTH_BASE_URL=https://<your-auth-server>.onrender.com
+```
 
-- **Task Submission**: Easily submit new tasks with detailed descriptions, due dates, and priorities.
+---
 
+## API Reference
 
+### Auth Server (`https://tasknex.onrender.com/api/auth`)
 
-![creating a new task](./screenshots/new_task.gif)
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/register` | Register a new user |
+| POST | `/login` | Login → returns JWT token |
+| GET | `/userinfo` | Get current user profile (requires `x-access-token` header) |
 
+### Main API Server (`https://tasknex-main.onrender.com`)
 
-**< Admin side >**
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/tasks` | Get all tasks |
+| POST | `/insertEvent` | Create an Event Idea |
+| POST | `/expenseClaim` | Create an Expense Claim |
+| PUT | `/updateTaskStatus/:id` | Update task status |
+| PUT | `/editTask/:id` | Edit task fields |
+| DELETE | `/delEvent/:id` | Delete a task |
 
-After logging in as an admin, you will have access to a dashboard displaying all tasks created by users in your team (e.g., HR, Accounts, etc.).
+---
 
+## Future Enhancements
 
-- **Dashboard Overview**: View all tasks in a centralized dashboard with status updates and visual charts.
+- Real-time notifications (email or in-app) for task status changes
+- Advanced filters and search by keyword, date, or priority
+- File/image attachments for expense claims
+- Integration with Slack or Microsoft Teams
 
-![total task and visual chart](./screenshots/admin_totalTask.gif)
+---
 
+## Authors
 
-
-- **Admin Controls**: Administrators can manage tasks across different time zones, update statuses, and ensure tasks are completed without being overlooked.
-
-![admin changes the status of task](./screenshots/admin_task_InProgress.gif)
-
-
-- Changes made by admins are updated in real time on the user's side.
-
-Before the admin updates the status:
-![user before changes](./screenshots/user_beforeAdmin.png)
-
-
-Right after the admin updates the status:
-![user after changes](./screenshots/user_afterAdmin.png)
-
-
-
-
-## Future enhancement 
-
-- **Task Notifications**:
-Add real-time email or in-app notifications to alert users and admins about task updates, deadlines, or status changes.
-- **Advanced Task Filters and Search**:
-Introduce robust filters and search functionality to help users quickly locate tasks based on keywords, due dates, or priority levels.
-- **Customizable Dashboards**:
-Allow users and admins to customize their dashboard views with widgets like task summaries, charts, or progress trackers.
-- **Integration with Third-Party Tools**:
-Enable integrations with popular tools like Slack, Microsoft Teams, or Google Calendar for better task management and collaboration.
-
-
-## Contributing
-
-This project was developed by our team to address specific task management challenges. Contributions are welcome! Please feel free to submit issues or pull requests for improvements and new features.
-
-
-
-
-
+EA, Yeji, and Victor
