@@ -6,43 +6,6 @@ A full-stack task management web application for teams — submit event ideas an
 
 ---
 
-## Screenshots
-
-### Login & Register
-<p float="left">
-  <img src="./screenshots/login.png" width="48%" />
-  <img src="./screenshots/register.png" width="48%" />
-</p>
-
-### Dashboard — User View
-![Dashboard User](./screenshots/dashboard-user.png)
-
-### Dashboard — Admin View (with Stats & Pie Chart)
-![Dashboard Admin](./screenshots/dashboard-admin.png)
-
-### New Task Modal
-![New Task](./screenshots/new-task.png)
-
-### Task Detail Modal
-![Task Detail](./screenshots/task-detail.png)
-
-> **Adding screenshots:** Take screenshots of each page and save them to the `screenshots/` folder with the filenames above.
-
----
-
-## Features
-
-- **JWT Authentication** — Secure register and login with encrypted passwords (bcryptjs)
-- **Role-based Access** — Admin and User roles with separate views and permissions
-- **Kanban Dashboard** — Tasks organized into 4 columns: Submitted / In Progress / Approved / Rejected
-- **Task Types** — Event Ideas and Expense Claims
-- **Admin Controls** — Approve, Reject, or mark tasks In Progress directly from the task popup
-- **Submitter Visibility** — Admins see who created each task (`First L.` format)
-- **Pie Chart Stats** — Admin-only stats banner showing task status distribution
-- **Form Validation** — Email format, Canadian phone `(###)-###-####`, password match check
-
----
-
 ## Tech Stack
 
 | Layer | Technology |
@@ -53,6 +16,64 @@ A full-stack task management web application for teams — submit event ideas an
 | Database | MongoDB Atlas |
 | Frontend Hosting | Vercel |
 | Backend Hosting | Render |
+
+---
+
+## Features
+
+### Authentication
+Secure register and login with JWT tokens and bcrypt-encrypted passwords. Users select their department and role (Admin or User) on registration.
+
+<p float="left">
+  <img src="./screenshots/login.png" width="48%" />
+  <img src="./screenshots/register.png" width="48%" />
+</p>
+
+- Email format validation
+- Canadian phone number auto-formatting `(###)-###-####`
+- Password visibility toggle + character-by-character peek effect
+- Password match confirmation
+
+---
+
+### Kanban Dashboard
+Tasks organized into 4 color-coded columns: **Submitted / In Progress / Approved / Rejected**
+
+![Dashboard User](./screenshots/dashboard-user.png)
+
+- Each card shows title, priority, due date, and task type
+- Click any card to open the task detail popup
+- Users only see their own submitted tasks
+
+---
+
+### Admin View
+Admins see all tasks filtered by department type, a stats banner with completion percentage, and a pie chart showing task status distribution.
+
+![Dashboard Admin](./screenshots/dashboard-admin.png)
+
+| Department | Sees |
+|------------|------|
+| HR Admin | All **Event Idea** tasks |
+| Account Admin | All **Expense Claim** tasks |
+| Other Admin | All tasks |
+
+- Submitter name displayed on each card (`First L.` format)
+- Approve / Reject / In Progress controls per task
+
+---
+
+### Create Task
+Submit a new Event Idea or Expense Claim with title, priority, due date, amount, and description.
+
+![New Task](./screenshots/new-task.png)
+
+---
+
+### Task Detail & Edit
+Click any task card to view full details. Admins can change status; any user can edit or delete their own tasks.
+
+![Task Detail](./screenshots/task-detail.png)
 
 ---
 
@@ -79,8 +100,8 @@ TaskNex/
     │   │   ├── authController.js  # /register, /login, /userinfo
     │   │   └── userModal.js       # Mongoose User schema
     │   ├── app.js
-    │   ├── db.js                  # Mongoose connection
-    │   └── config.js              # JWT secret config
+    │   ├── db.js
+    │   └── config.js
     │
     └── TaskNex_Server/            # Main API server → Render (port 8888)
         └── tasknexServer.js       # All task CRUD & status endpoints
@@ -113,7 +134,6 @@ JWT_SECRET=your_secret_key
 ```
 ```bash
 npm start
-# → listening on port 5050
 ```
 
 ### 3. Main API Server — terminal 2
@@ -128,7 +148,6 @@ MongoOnline=mongodb+srv://<user>:<password>@cluster.mongodb.net/
 ```
 ```bash
 npm start
-# → listening on port 8888
 ```
 
 ### 4. Frontend — terminal 3
@@ -152,8 +171,6 @@ npm start
 
 ### Backend (Render.com)
 
-Deploy each backend as a separate **Web Service**:
-
 | Setting | Auth Server | Main API Server |
 |---------|-------------|-----------------|
 | Root Directory | `Backend/AuthServerPlusSchema` | `Backend/TaskNex_Server` |
@@ -162,48 +179,34 @@ Deploy each backend as a separate **Web Service**:
 
 **Environment Variables:**
 
-Auth Server:
-```
-MONGO_URI=<atlas_connection_string>/tasknexdb
-JWT_SECRET=<your_secret>
-```
+Auth Server: `MONGO_URI`, `JWT_SECRET`
 
-Main API Server:
-```
-MongoOnline=<atlas_connection_string>
-NODE_VERSION=18
-```
+Main API Server: `MongoOnline`, `NODE_VERSION=18`
 
-> **Important:** In MongoDB Atlas → **Network Access**, add `0.0.0.0/0` to allow connections from Render's dynamic IPs.
+> **Important:** MongoDB Atlas → **Network Access** must allow `0.0.0.0/0` for Render's dynamic IPs.
 
 ### Frontend (Vercel)
-
-Import the GitHub repo and set:
 
 | Setting | Value |
 |---------|-------|
 | Root Directory | `react-front-end` |
 | Framework | Create React App |
-
-**Environment Variables:**
-```
-REACT_APP_API_BASE_URL=https://<your-main-api>.onrender.com
-REACT_APP_AUTH_BASE_URL=https://<your-auth-server>.onrender.com
-```
+| `REACT_APP_API_BASE_URL` | `https://<main-api>.onrender.com` |
+| `REACT_APP_AUTH_BASE_URL` | `https://<auth-server>.onrender.com` |
 
 ---
 
 ## API Reference
 
-### Auth Server (`https://tasknex.onrender.com/api/auth`)
+### Auth Server (`/api/auth`)
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | POST | `/register` | Register a new user |
 | POST | `/login` | Login → returns JWT token |
-| GET | `/userinfo` | Get current user profile (requires `x-access-token` header) |
+| GET | `/userinfo` | Get current user profile |
 
-### Main API Server (`https://tasknex-main.onrender.com`)
+### Main API Server
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
@@ -218,7 +221,7 @@ REACT_APP_AUTH_BASE_URL=https://<your-auth-server>.onrender.com
 
 ## Future Enhancements
 
-- Real-time notifications (email or in-app) for task status changes
+- Real-time notifications for task status changes
 - Advanced filters and search by keyword, date, or priority
 - File/image attachments for expense claims
 - Integration with Slack or Microsoft Teams
