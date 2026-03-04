@@ -469,10 +469,12 @@ TaskNexApp.get('/usersWithEventsAndClaims', async (req, res) => {
 
 
 
-MongoClient.connect(MongoOnline, (err, client) => {
-    if(err) console.log("error while connecting");
+MongoClient.connect(MongoOnline).then(client => {
     db = client.db('tasknexdb');
-    TaskNexApp.listen(port, '0.0.0.0',()=>{
+    TaskNexApp.listen(port, '0.0.0.0', () => {
         console.log(`listening on port ${port}`)
     })
+}).catch(err => {
+    console.error("Error connecting to MongoDB:", err);
+    process.exit(1);
 })
